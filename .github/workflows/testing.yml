@@ -29,7 +29,7 @@ jobs:
           organization: ${{ env.organization }}
 
       - name: Store output in result file
-        run: echo '${{ steps.load-runner-info-org.outputs.actions }}' > 'runners-organization.json'
+        run: echo '${{ steps.load-runner-info-org.outputs.runners }}' > 'runners-organization.json'
             
       - name: Upload result file as artefact
         uses: actions/upload-artifact@v2
