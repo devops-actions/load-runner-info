@@ -45,8 +45,10 @@ jobs:
               core.error('No runners found')            
               return
             }
-
+            console.log(`Found ${info.runners.length} runners`)
             for (let num = 0; num < info.runners.length; num++) {
               const runner = info.runners[num]
-              console.log(runner.name)
+              console.log(`- ${runner.name}`)
             }
+
+            // todo: group by label and then set some thresholds to test
