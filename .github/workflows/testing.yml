@@ -1,0 +1,38 @@
+name: Testing the action
+
+on: 
+  push:
+
+  workflow_dispatch:
+
+env:
+  organization: devops-actions
+  repo: load-runner-info
+
+jobs:
+  build: # make sure build/ci work properly
+    runs-on: ubuntu-latest
+    #if: github.ref == 'refs/heads/main' # don't run on PRs
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm ci
+      - run: npm run all
+
+  test-from-organization:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        id: load-runner-info-org
+        with: 
+          accessToken: ${{ secrets.PAT }}
+          organization: ${{ env.organization }}
+
+      - name: Store output in result file
+        run: echo '${{ steps.load-runner-info-org.outputs.actions }}' > 'runners-organization.json'
+            
+      - name: Upload result file as artefact
+        uses: actions/upload-artifact@v2
+        with: 
+          name: actions-organization-${{ env.organization }}
+          path: actions-organization.json

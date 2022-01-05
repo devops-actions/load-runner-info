@@ -1,0 +1,55 @@
+{
+    "name": "load-available-actions",
+    "version": "0.0.1",
+    "private": false,
+    "description": "GitHub Action to load all available runner information for an organization",
+    "main": "lib/main.js",
+    "scripts": {
+      "esbuild": "esbuild src/main.ts --bundle --outdir=dist --platform=node --external:vscode --external:@vscode/test-electron --external:jest",
+      "old_build": "tsc",
+      "format": "prettier --write **/*.ts",
+      "format-check": "prettier --check **/*.ts",
+      "lint": "eslint src/**/*.ts",
+      "package": "npm run esbuild",
+      "test": "jest",
+      "all": "npm run esbuild && npm run test # && npm run lint",
+      "old_all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/devops-actions/load-runner-info.git"
+    },
+    "keywords": [
+      "GitHub Actions",
+      "Load available runner information from a GitHub organization"
+    ],
+    "author": "@rajbos",
+    "license": "MIT",
+    "dependencies": {
+      "@actions/core": "^1.6.0",
+      "moment": "^2.29.1",
+      "octokit": "^1.7.1",
+      "yaml": "^1.10.2"
+    },
+    "devDependencies": {
+      "@types/node": "^16.11.11",
+      "@typescript-eslint/parser": "^4.28.3",
+      "@vercel/ncc": "^0.33.0",
+      "ansi-regex": ">=5.0.1",
+      "dotenv": "^10.0.0",
+      "esbuild": "^0.14.2",
+      "eslint": "^8.4.0",
+      "eslint-plugin-github": "^4.3.5",
+      "eslint-plugin-jest": "^25.3.0",
+      "jest": "^27.4.3",
+      "js-yaml": "^4.1.0",
+      "prettier": "2.5.1",
+      "tmpl": ">=1.0.5",
+      "ts-jest": "^27.1.0",
+      "typescript": "^4.5.2"
+    },
+    "optionalDependencies": {
+      "fsevents": "^2.3.2"
+    }
+  }
+  
