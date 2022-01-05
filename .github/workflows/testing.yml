@@ -40,4 +40,14 @@ jobs:
       - uses: actions/github-script@v5
         with: 
           script: |
-            console.log('Hello from GitHub Actions!');
+            console.log('Hello from GitHub Actions!')
+            const info = JSON.parse(`${{ steps.load-runner-info-org.outputs.runners }}`)
+            if (info.length == 0) {
+              core.error('No runners found')            
+              return
+            }
+
+            for (let num = 0; num < runners.runners.length; num++) {
+              const runner = runners.runners[num]
+              console.log(runner.name)
+            }
