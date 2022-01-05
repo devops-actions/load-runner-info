@@ -34,5 +34,10 @@ jobs:
       - name: Upload result file as artefact
         uses: actions/upload-artifact@v2
         with: 
-          name: actions-organization-${{ env.organization }}
-          path: actions-organization.json
+          name: runners-organization-${{ env.organization }}
+          path: runners-organization.json
+
+      - uses: actions/github-script@v5
+        with: 
+          script: |
+            console.log('Hello from GitHub Actions!');
