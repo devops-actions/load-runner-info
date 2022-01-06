@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with: 
           name: runners-organization-${{ env.organization }}
-          path: /**.json
+          path: '**.json'
 
       - uses: actions/github-script@v5
         with: 
