@@ -80,7 +80,8 @@ Grouped output example:
 # Full usage example
 Below is an example how I use this action to load the information on the available runners as well as test if there are enough runners online (see step `Test runner info`).
 ``` yaml
-test-from-organization:
+jobs:
+  test-from-organization:
     runs-on: ubuntu-latest
     steps:
       - uses: devops-actions/load-runner-info@main
