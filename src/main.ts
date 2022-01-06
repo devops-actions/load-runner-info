@@ -73,6 +73,7 @@ async function run(): Promise<void> {
     core.setOutput('runners', json)
 
     const grouped = groupRunnersByLabel(runnerInfo)
+    console.log(`Found ${grouped.length} groups`)
     const jsonGrouped = JSON.stringify(grouped)
     core.setOutput('grouped', jsonGrouped)
 }

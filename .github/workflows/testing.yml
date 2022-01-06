@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with: 
           name: runners-organization-${{ env.organization }}
-          path: '**.json'
+          path: 'runners-**.json'
 
       - uses: actions/github-script@v5
         with: 
@@ -54,4 +54,9 @@ jobs:
               console.log(`- ${runner.name}`)
             }
 
-           
+            const grouped = JSON.parse(`${{ steps.load-runner-info-org.outputs.grouped }}`)
+            console.log(`Found ${grouped.length} runner label(s)`)
+            for (let num = 0; num < grouped.length; num++) {
+              const group = grouped[num]
+              console.log(`- label: ${group.name}, runner with this label: ${group.counter}`)
+            }

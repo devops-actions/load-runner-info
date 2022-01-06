@@ -14657,6 +14657,24 @@ var require_main = __commonJS({
 var core = __toESM(require_core());
 var import_octokit = __toESM(require_dist_node24());
 var import_dotenv = __toESM(require_main());
+
+// src/grouping.ts
+function groupRunnersByLabel(runnersJson) {
+  const groups = [];
+  runnersJson.runners.forEach((runner) => {
+    runner.labels.forEach((label) => {
+      const index = groups.findIndex((g) => g.name === label.name);
+      if (index > -1) {
+        groups[index].counter = groups[index].counter + 1;
+      } else {
+        groups.push({ name: label.name, counter: 1 });
+      }
+    });
+  });
+  return groups;
+}
+
+// src/main.ts
 import_dotenv.default.config();
 function run() {
   return __async(this, null, function* () {
@@ -14706,6 +14724,10 @@ function run() {
     console.log(`Found ${runnerInfo.total_count} runners`);
     const json = JSON.stringify(runnerInfo);
     core.setOutput("runners", json);
+    const grouped = groupRunnersByLabel(runnerInfo);
+    console.log(`Found ${grouped.length} groups`);
+    const jsonGrouped = JSON.stringify(grouped);
+    core.setOutput("grouped", jsonGrouped);
   });
 }
 run();
