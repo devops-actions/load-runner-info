@@ -22,7 +22,7 @@ Read the complete example for using the outputs as well.
 |`accessToken`|string|The access token to use to connect to the GitHub API|
 
 ### Access token information
-To run this action at the **organization** level, the access token must have scope `admin:org`
+To run this action at the **organization** level, the access token must have scope `admin:org` (PAT) or `org:Self-hosted runners` (GitHub App).
 To run this action at the **repository** level, the access token must have scope `owner:repo`
 
 ## Outputs
