@@ -1,0 +1,78 @@
+name: Testing the action
+
+on: 
+  push:
+
+  workflow_dispatch:
+
+env:
+  organization: devops-actions
+  repo: load-runner-info
+
+jobs:
+  build: # make sure build/ci work properly
+    runs-on: ubuntu-latest
+    #if: github.ref == 'refs/heads/main' # don't run on PRs
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm ci
+      - run: npm run all
+
+  test-from-organization:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        id: load-runner-info-org
+        with: 
+          accessToken: ${{ secrets.PAT }}
+          organization: ${{ env.organization }}
+
+      - name: Store output in result files
+        run: |
+          echo '${{ steps.load-runner-info-org.outputs.runners }}' > 'runners-organization.json'
+          echo '${{ steps.load-runner-info-org.outputs.grouped }}' > 'runners-grouped-organization.json'
+            
+      - name: Upload result file as artefact for inspection
+        uses: actions/upload-artifact@v2
+        with: 
+          name: runners-organization-${{ env.organization }}
+          path: 'runners-**.json'
+
+      - uses: actions/github-script@v5
+        name: Test runner info
+        with: 
+          script: |
+            const info = JSON.parse(`${{ steps.load-runner-info-org.outputs.runners }}`)
+            if (info.length == 0) {
+              core.error('No runners found')            
+              return
+            }
+            
+            console.log(`Found [${info.runners.length}] runner(s)`)
+            for (let num = 0; num < info.runners.length; num++) {
+              const runner = info.runners[num]
+              console.log(`- name: [${runner.name}]`)
+            }
+
+            console.log(``)
+
+            const grouped = JSON.parse(`${{ steps.load-runner-info-org.outputs.grouped }}`)
+            console.log(`Found ${grouped.length} runner label(s)`)
+            for (let num = 0; num < grouped.length; num++) {
+              const group = grouped[num]
+              console.log(`- label: [${group.name}], runner with this label: [${group.counter}] with [${group.status}] online runners`)
+            }
+
+            // find the runner with the label 'self-hosted'
+            const selfHosted = grouped.find(label => label.name === 'self-hosted')
+            if (!selfHosted) {
+              core.error('No runner with label "self-hosted" found')
+              return
+            }
+
+            // example of a test you can do on the amount of runners online with this label
+            if (selfHosted.status > 10) {
+              core.error('Too many runners with label "self-hosted" found')
+              return
+            }

@@ -1,0 +1,25 @@
+# action.yml
+name: 'Load runner information'
+author: 'Rob Bos'
+description: 'Load an overview of all available runners in a GitHub Organization'
+branding:
+  icon : alert-circle
+  color: blue
+inputs:
+  organization:
+    description: 'Slug of the organization to analyze.'
+    required: true    
+  repo:
+    description: 'Slug of the repository to analyze.'
+    required: false
+  accessToken:
+    description: 'Access token to use for analysis with either admin:org or repo owner if you run it against a repo'
+    required: true
+outputs:
+  runners:
+    description: 'JSON string with the runner information available in the organization or repo'
+  grouped:
+    description: 'JSON string with the labels and the number of runners with that label'
+runs:
+  using: 'node12'
+  main: 'dist/main.js'
