@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {Octokit} from 'octokit'
 import dotenv from 'dotenv'
+import { groupRunnersByLabel } from './grouping'
 
 // always import the config
 dotenv.config()
@@ -70,6 +71,10 @@ async function run(): Promise<void> {
     console.log(`Found ${runnerInfo.total_count} runners`)
     const json = JSON.stringify(runnerInfo)
     core.setOutput('runners', json)
+
+    const grouped = groupRunnersByLabel(runnerInfo)
+    const jsonGrouped = JSON.stringify(grouped)
+    core.setOutput('grouped', jsonGrouped)
 }
 
 run()
