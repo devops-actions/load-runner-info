@@ -62,7 +62,7 @@ const singleRunnerData = JSON.parse(`{
                     "id": 2,
                     "name": "ROB-XPS9700-2",
                     "os": "windows",
-                    "status": "online",
+                    "status": "offline",
                     "busy": false,
                     "labels": [
                         {
@@ -107,23 +107,27 @@ test('grouping twoRunnerData returns 4 groups with correct counter each', () => 
     expect(selfHostedGroup).toBeDefined()
     if (selfHostedGroup){
         expect(selfHostedGroup.counter).toBe(2)
+        expect(selfHostedGroup.status).toBe(1)
     }
 
     const windowsGroup = groups.find((g: any) => g.name === 'Windows')
     expect(windowsGroup).toBeDefined()
     if (windowsGroup){
         expect(windowsGroup.counter).toBe(2)
+        expect(windowsGroup.status).toBe(1)
     }
 
     const bitnessGroup = groups.find((g: any) => g.name === 'X64')
     expect(bitnessGroup).toBeDefined()
     if (bitnessGroup){
         expect(bitnessGroup.counter).toBe(2)
+        expect(bitnessGroup.status).toBe(1)
     }
 
     const testGroup = groups.find((g: any) => g.name === 'Test')
     expect(testGroup).toBeDefined()
     if (testGroup){
         expect(testGroup.counter).toBe(1)
+        expect(testGroup.status).toBe(0)
     }
 })

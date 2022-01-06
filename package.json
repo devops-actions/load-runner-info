@@ -6,14 +6,12 @@
     "main": "lib/main.js",
     "scripts": {
         "esbuild": "esbuild src/main.ts --bundle --outdir=dist --platform=node --external:vscode --external:@vscode/test-electron --external:jest",
-        "old_build": "tsc",
         "format": "prettier --write **/*.ts",
         "format-check": "prettier --check **/*.ts",
         "lint": "eslint src/**/*.ts",
         "package": "npm run esbuild",
         "test": "jest --passWithNoTests",
-        "all": "npm run esbuild && npm run test # && npm run lint",
-        "old_all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+        "all": "npm run esbuild && npm run test # && npm run lint"
     },
     "repository": {
         "type": "git",
