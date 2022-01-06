@@ -28,7 +28,10 @@ async function run(): Promise<void> {
       return
     }
 
-    const octokit = new Octokit({auth: accessToken})
+    const apiUrl = process.env.GITHUB_API_URL || 'https://api.github.com' 
+    core.debug(`Using API URL: ${apiUrl}`)
+
+    const octokit = new Octokit({auth: accessToken, baseUrl: apiUrl})
 
     let runnerInfo: any = {}
     if (organization !== '' && repo === '') {
