@@ -45,10 +45,23 @@ jobs:
               core.error('No runners found')            
               return
             }
-            console.log(`Found ${info.runners.length} runners`)
+            
+            console.log(`Found ${info.runners.length} runner(s)`)
             for (let num = 0; num < info.runners.length; num++) {
               const runner = info.runners[num]
               console.log(`- ${runner.name}`)
             }
 
             // todo: group by label and then set some thresholds to test
+            const script = require('./src/grouping.ts')
+            const groups = script.groupRunnersByLabel(info.runners)
+
+            if (groups.length == 0) {
+              core.error('No groups found')            
+              return
+            }
+
+            if (groups.length > 1) {
+              core.error('More than one group found')            
+              return
+            }
