@@ -129,13 +129,13 @@ jobs:
             // example of a test you can do on the amount of runners online with this label
             const selfHosted = grouped.find(group => group.name === 'self-hosted')
             if (selfHosted.status > 10) {
-              core.error('Too many runners with label "self-hosted" found')
+              core.error(`Too many runners with label "self-hosted" found`)
               return
             }
 
             // example of a test you can do on the amount of runners online with this label
             if (selfHosted.status < selfHosted.counter) {
-              core.error('There are [${selfHosted.counter - selfHosted.status}] runners offline')
+              core.error(`There are [${selfHosted.counter - selfHosted.status}] runners offline`)
               return
             }
 ```
