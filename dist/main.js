@@ -14706,7 +14706,7 @@ function run() {
         runnerInfo = data;
       } catch (error) {
         console.log(error);
-        core.setFailed(`Could not authenticate with PAT. Please check that it is correct and that it has [read access] to the organization or user account: ${error}`);
+        core.setFailed(`Could not authenticate with access token. Please check that it is correct and that it has the correct scope (see readme) to the organization: ${error}`);
         return;
       }
     }
@@ -14721,7 +14721,7 @@ function run() {
         runnerInfo = data;
       } catch (error) {
         console.log(error);
-        core.setFailed(`Could not authenticate with PAT. Please check that it is correct and that it has [read access] to the organization or user account: ${error}`);
+        core.setFailed(`Could not authenticate with access token. Please check that it is correct and that it has the correct scope (see readme) on the repository: ${error}`);
         return;
       }
     }
