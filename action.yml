@@ -17,7 +17,9 @@ inputs:
     required: true
 outputs:
   runners:
-    description: 'JSON string with the runner information available in the organization or repo'  
+    description: 'JSON string with the runner information available in the organization or repo'
+  grouped:
+    description: 'JSON string with the labels and the number of runners with that label'
 runs:
   using: 'node12'
   main: 'dist/main.js'
