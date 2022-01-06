@@ -40,6 +40,7 @@ jobs:
           path: 'runners-**.json'
 
       - uses: actions/github-script@v5
+        name: Test runner info
         with: 
           script: |
             const info = JSON.parse(`${{ steps.load-runner-info-org.outputs.runners }}`)

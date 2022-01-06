@@ -14664,10 +14664,12 @@ function groupRunnersByLabel(runnersJson) {
   runnersJson.runners.forEach((runner) => {
     runner.labels.forEach((label) => {
       const index = groups.findIndex((g) => g.name === label.name);
+      const status = runner.status === "online" ? 1 : 0;
       if (index > -1) {
         groups[index].counter = groups[index].counter + 1;
+        groups[index].status = groups[index].status + status;
       } else {
-        groups.push({ name: label.name, counter: 1 });
+        groups.push({ name: label.name, counter: 1, status });
       }
     });
   });
