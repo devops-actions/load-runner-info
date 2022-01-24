@@ -1,0 +1,105 @@
+name: Publishing the action to the marketplace
+
+on:   
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    
+jobs:
+  test-from-organization:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        id: load-runner-info-org
+        with: 
+          accessToken: ${{ secrets.PAT }}
+          organization: ${{ env.organization }}
+
+      - name: Store output in result files
+        run: |
+          echo '${{ steps.load-runner-info-org.outputs.runners }}' > 'runners-organization.json'
+          echo '${{ steps.load-runner-info-org.outputs.grouped }}' > 'runners-grouped-organization.json'
+            
+      - name: Upload result file as artefact for inspection
+        uses: actions/upload-artifact@v2
+        with: 
+          name: runners-organization-${{ env.organization }}
+          path: 'runners-**.json'
+
+      - uses: actions/github-script@v5
+        name: Test runner info
+        with: 
+          script: |
+            const info = JSON.parse(`${{ steps.load-runner-info-org.outputs.runners }}`)
+            if (info.length == 0) {
+              core.error('No runners found')            
+              return
+            }
+            
+            console.log(`Found [${info.runners.length}] runner(s)`)
+            for (let num = 0; num < info.runners.length; num++) {
+              const runner = info.runners[num]
+              console.log(`- name: [${runner.name}]`)
+            }
+
+            console.log(``)
+
+            const grouped = JSON.parse(`${{ steps.load-runner-info-org.outputs.grouped }}`)
+            console.log(`Found ${grouped.length} runner label(s)`)
+            for (let num = 0; num < grouped.length; num++) {
+              const group = grouped[num]
+              console.log(`- label: [${group.name}], runner with this label: [${group.counter}] with [${group.status}] online runners`)
+            }
+
+            // find the runner with the label 'self-hosted'
+            const selfHosted = grouped.find(label => label.name === 'self-hosted')
+            if (!selfHosted) {
+              core.error('No runner with label "self-hosted" found')
+              return
+            }
+
+            // example of a test you can do on the amount of runners online with this label
+            if (selfHosted.status > 10) {
+              core.error('Too many runners with label "self-hosted" found')
+              return
+            }
+    
+  publish:
+    needs: test-from-organization
+    runs-on: ubuntu-latest
+    steps:
+      # get code
+      - uses: actions/checkout@v2
+
+      # build it
+      - run: |
+          npm ci
+          npm run all
+
+      # get tag for this release
+      - name: Get tag value
+        id: tag
+        uses: rajbos-actions/action-get-tag@v1   
+
+      # publish a release with the build assets
+      - uses: rajbos-actions/action-gh-release@v1
+        id: publish
+        with:
+          name: Release ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ github.ref }}
+          body: Release ${{ steps.tag.outputs.tag }} is available now
+          files: ./dist/main.js
+          token: ${{ secrets.PAT }}
+
+      - run: |
+          echo "$url"
+        env:
+          url: ${{ steps.publish.outputs.url }}
+
+      - uses: rajbos-actions/slack@v1
+        with: 
+          status: ${{ job.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
