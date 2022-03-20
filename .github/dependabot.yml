@@ -7,3 +7,4 @@ updates:
     # Check the npm registry for updates every week
     schedule:
       interval: 'weekly'
+    open-pull-requests-limit: 10
