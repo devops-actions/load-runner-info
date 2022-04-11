@@ -27,7 +27,7 @@
         "@actions/core": "^1.6.0",
         "moment": "^2.29.2",
         "octokit": "^1.7.1",
-        "yaml": "^1.10.2"
+        "yaml": "^2.0.0"
     },
     "devDependencies": {
         "@types/node": "^17.0.23",
