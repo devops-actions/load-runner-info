@@ -13,7 +13,7 @@ jobs:
   test-from-organization:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./
         id: load-runner-info-org
         with: 
@@ -72,9 +72,11 @@ jobs:
   publish:
     needs: test-from-organization
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       # get code
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # build it
       - run: |
