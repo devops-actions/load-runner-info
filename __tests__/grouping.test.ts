@@ -1,7 +1,7 @@
 import {expect, test} from '@jest/globals'
 import { groupRunnersByLabel } from '../src/grouping'
 
-const singleRunnerData = JSON.parse(`{
+const singleRunnerData = JSON.parse(`
     [
         {
             "id": 2,
@@ -27,10 +27,9 @@ const singleRunnerData = JSON.parse(`{
                 }
                 ]
             }
-        ]
-    }`)
+        ]`)
 
-    const twoRunnerData = JSON.parse(`{
+    const twoRunnerData = JSON.parse(`
         [
             {
                 "id": 1,
@@ -85,8 +84,7 @@ const singleRunnerData = JSON.parse(`{
                         }
                         ]
                     }
-            ]
-        }`)
+            ]`)
 
 test('grouping singleRunnerData returns 3 groups with a single counter each', () => {
     const groups = groupRunnersByLabel(singleRunnerData)
