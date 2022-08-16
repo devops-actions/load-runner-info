@@ -37,12 +37,19 @@ async function run(): Promise<void> {
     if (organization !== '' && repo === '') {
       try {
         console.log(`Loading all runners from organization [${organization}]`)
-        const { data } = await octokit.request("GET /orgs/{owner}/actions/runners", {
-          owner: organization
-        })
+        let data
+        await octokit.paginate(
+            octokit.request("GET /orgs/{owner}/actions/runners", {
+                            owner: organization
+                            })
+        ).then(
+          (runners: any) => {data = runners}
+        )
 
-        console.log(`Found ${data.total_count} runners at the org level`)
-        runnerInfo = data
+        if (data) {
+          console.log(`Found ${data.total_count} runners at the org level`)
+          runnerInfo = data
+        }
       } catch (error) {
         console.log(error)
         core.setFailed(
