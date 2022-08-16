@@ -7,7 +7,7 @@ interface group {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function groupRunnersByLabel(runnersJson: any): group[] {
   const groups: group[] = []
-  runnersJson.runners.forEach((runner: any) => {
+  runnersJson.forEach((runner: any) => {
         runner.labels.forEach((label: any) => {
             const index = groups.findIndex((g: any) => g.name === label.name)
             const status = runner.status === 'online' ? 1 : 0

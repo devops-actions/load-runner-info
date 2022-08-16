@@ -37,15 +37,16 @@ async function run(): Promise<void> {
     if (organization !== '' && repo === '') {
       try {
         console.log(`Loading all runners from organization [${organization}]`)
-       const data = await octokit.paginate("GET /orgs/{owner}/actions/runners", {
+        const { data } = await octokit.paginate("GET /orgs/{owner}/actions/runners", {
                                 owner: organization
                               })
 
         if (data) {
-          console.log(`Found ${data.total_count} runners at the org level`)
+          console.log(`Found ${data.length} runners at the org level`)
           console.log(JSON.stringify(data))
-          runnerInfo = data
         }
+
+        runnerInfo = data
       } catch (error) {
         console.log(error)
         core.setFailed(
@@ -58,12 +59,12 @@ async function run(): Promise<void> {
     if (repo !== '') {
       try {
         console.log(`Loading all runners from repo [${organization}/${repo}]`)
-        const { data } = await octokit.request("GET /repos/{owner}/{repo}/actions/runners", {
+        const { data } = await octokit.paginate("GET /repos/{owner}/{repo}/actions/runners", {
           owner: organization,
           repo
         })
 
-        console.log(`Found ${data.total_count} runners at the repo level`)
+        console.log(`Found ${data.length} runners at the repo level`)
         runnerInfo = data
       } catch (error) {
         console.log(error)
@@ -74,13 +75,13 @@ async function run(): Promise<void> {
       }
     }
 
-    if (!runnerInfo.total_count) {
+    if (!runnerInfo) {
       core.setFailed(
         `Could not load any runners. Please check that the organization and repository are correct.`
       )
     }
     else {
-      console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`)
+      console.log(`Found ${runnerInfo.length} runners`)
       const json = JSON.stringify(runnerInfo)
       core.setOutput('runners', json)
 
