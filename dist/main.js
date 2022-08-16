@@ -14887,11 +14887,16 @@ function run() {
     if (organization !== "" && repo === "") {
       try {
         console.log(`Loading all runners from organization [${organization}]`);
-        const { data } = yield octokit.request("GET /orgs/{owner}/actions/runners", {
+        let data;
+        yield octokit.paginate("GET /orgs/{owner}/actions/runners", {
           owner: organization
+        }).then((runners) => {
+          data = runners;
         });
-        console.log(`Found ${data.total_count} runners at the org level`);
-        runnerInfo = data;
+        if (data) {
+          console.log(`Found ${data.total_count} runners at the org level`);
+          runnerInfo = data;
+        }
       } catch (error) {
         console.log(error);
         core.setFailed(`Could not authenticate with access token. Please check that it is correct and that it has the correct scope (see readme) to the organization: ${error}`);
