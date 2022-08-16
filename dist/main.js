@@ -14892,6 +14892,7 @@ function run() {
         });
         if (data) {
           console.log(`Found ${data.total_count} runners at the org level`);
+          console.log(JSON.stringify(data));
           runnerInfo = data;
         }
       } catch (error) {
@@ -14915,7 +14916,7 @@ function run() {
         return;
       }
     }
-    if (!runnerInfo) {
+    if (!runnerInfo.total_count) {
       core.setFailed(`Could not load any runners. Please check that the organization and repository are correct.`);
     } else {
       console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`);
