@@ -14887,7 +14887,7 @@ function run() {
     if (organization !== "" && repo === "") {
       try {
         console.log(`Loading all runners from organization [${organization}]`);
-        const { data } = yield octokit.paginate("GET /orgs/{owner}/actions/runners", {
+        const data = yield octokit.paginate("GET /orgs/{owner}/actions/runners", {
           owner: organization
         });
         if (data) {
@@ -14904,7 +14904,7 @@ function run() {
     if (repo !== "") {
       try {
         console.log(`Loading all runners from repo [${organization}/${repo}]`);
-        const { data } = yield octokit.paginate("GET /repos/{owner}/{repo}/actions/runners", {
+        const data = yield octokit.paginate("GET /repos/{owner}/{repo}/actions/runners", {
           owner: organization,
           repo
         });

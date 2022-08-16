@@ -37,7 +37,7 @@ async function run(): Promise<void> {
     if (organization !== '' && repo === '') {
       try {
         console.log(`Loading all runners from organization [${organization}]`)
-        const { data } = await octokit.paginate("GET /orgs/{owner}/actions/runners", {
+        const data = await octokit.paginate("GET /orgs/{owner}/actions/runners", {
                                 owner: organization
                               })
 
@@ -59,7 +59,7 @@ async function run(): Promise<void> {
     if (repo !== '') {
       try {
         console.log(`Loading all runners from repo [${organization}/${repo}]`)
-        const { data } = await octokit.paginate("GET /repos/{owner}/{repo}/actions/runners", {
+        const data = await octokit.paginate("GET /repos/{owner}/{repo}/actions/runners", {
           owner: organization,
           repo
         })
