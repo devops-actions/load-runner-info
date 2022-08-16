@@ -2,8 +2,7 @@ import {expect, test} from '@jest/globals'
 import { groupRunnersByLabel } from '../src/grouping'
 
 const singleRunnerData = JSON.parse(`{
-    "total_count": 1,
-    "runners": [
+    [
         {
             "id": 2,
             "name": "ROB-XPS9700",
@@ -32,8 +31,7 @@ const singleRunnerData = JSON.parse(`{
     }`)
 
     const twoRunnerData = JSON.parse(`{
-        "total_count": 2,
-        "runners": [
+        [
             {
                 "id": 1,
                 "name": "ROB-XPS9700-1",
