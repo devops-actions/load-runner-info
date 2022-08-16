@@ -42,7 +42,7 @@ async function run(): Promise<void> {
                               })
 
         if (data) {
-          console.log(`Found ${data.total_count} runners at the org level`)
+          console.log(`Found ${data.length} runners at the org level`)
           console.log(JSON.stringify(data))
           runnerInfo = data
         }
@@ -74,13 +74,13 @@ async function run(): Promise<void> {
       }
     }
 
-    if (!runnerInfo.total_count) {
+    if (!runnerInfo) {
       core.setFailed(
         `Could not load any runners. Please check that the organization and repository are correct.`
       )
     }
     else {
-      console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`)
+      console.log(`Found ${runnerInfo.length} runners`)
       const json = JSON.stringify(runnerInfo)
       core.setOutput('runners', json)
 

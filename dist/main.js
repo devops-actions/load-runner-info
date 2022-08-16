@@ -14849,7 +14849,7 @@ var import_dotenv = __toESM(require_main());
 // src/grouping.ts
 function groupRunnersByLabel(runnersJson) {
   const groups = [];
-  runnersJson.runners.forEach((runner) => {
+  runnersJson.forEach((runner) => {
     runner.labels.forEach((label) => {
       const index = groups.findIndex((g) => g.name === label.name);
       const status = runner.status === "online" ? 1 : 0;
@@ -14891,7 +14891,7 @@ function run() {
           owner: organization
         });
         if (data) {
-          console.log(`Found ${data.total_count} runners at the org level`);
+          console.log(`Found ${data.length} runners at the org level`);
           console.log(JSON.stringify(data));
           runnerInfo = data;
         }
@@ -14916,10 +14916,10 @@ function run() {
         return;
       }
     }
-    if (!runnerInfo.total_count) {
+    if (!runnerInfo) {
       core.setFailed(`Could not load any runners. Please check that the organization and repository are correct.`);
     } else {
-      console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`);
+      console.log(`Found ${runnerInfo.length} runners`);
       const json = JSON.stringify(runnerInfo);
       core.setOutput("runners", json);
       const grouped = groupRunnersByLabel(runnerInfo);
