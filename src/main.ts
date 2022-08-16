@@ -38,11 +38,10 @@ async function run(): Promise<void> {
       try {
         console.log(`Loading all runners from organization [${organization}]`)
         let data
-        await octokit.paginate(
-            octokit.request("GET /orgs/{owner}/actions/runners", {
-                            owner: organization
-                            })
-        ).then(
+        await octokit.paginate("GET /orgs/{owner}/actions/runners", {
+                                owner: organization
+                              })
+        .then(
           (runners: any) => {data = runners}
         )
 
