@@ -14887,7 +14887,7 @@ function run() {
     if (organization !== "" && repo === "") {
       try {
         console.log(`Loading all runners from organization [${organization}]`);
-        const data = yield octokit.paginate("GET /orgs/{owner}/actions/runners", {
+        const { data } = yield octokit.paginate("GET /orgs/{owner}/actions/runners", {
           owner: organization
         });
         if (data) {
@@ -14904,11 +14904,11 @@ function run() {
     if (repo !== "") {
       try {
         console.log(`Loading all runners from repo [${organization}/${repo}]`);
-        const { data } = yield octokit.request("GET /repos/{owner}/{repo}/actions/runners", {
+        const { data } = yield octokit.paginate("GET /repos/{owner}/{repo}/actions/runners", {
           owner: organization,
           repo
         });
-        console.log(`Found ${data.total_count} runners at the repo level`);
+        console.log(`Found ${data.length} runners at the repo level`);
         runnerInfo = data;
       } catch (error) {
         console.log(error);
