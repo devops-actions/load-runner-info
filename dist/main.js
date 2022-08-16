@@ -14892,7 +14892,7 @@ function run() {
         });
         if (data) {
           console.log(`Found ${data.length} runners at the org level`);
-          console.log(JSON.stringify(data));
+          core.debug("Found this data: " + JSON.stringify(data));
         }
         runnerInfo = data;
       } catch (error) {
@@ -14909,6 +14909,7 @@ function run() {
           repo
         });
         console.log(`Found ${data.length} runners at the repo level`);
+        core.debug("Found this data: " + JSON.stringify(data));
         runnerInfo = data;
       } catch (error) {
         console.log(error);
