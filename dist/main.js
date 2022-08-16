@@ -14916,7 +14916,7 @@ function run() {
         return;
       }
     }
-    if (!runnerInfo) {
+    if (runnerInfo === void 0) {
       core.setFailed(`Could not load any runners. Please check that the organization and repository are correct.`);
     } else {
       console.log(`Found ${runnerInfo.length} runners`);

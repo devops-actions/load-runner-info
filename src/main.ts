@@ -74,7 +74,7 @@ async function run(): Promise<void> {
       }
     }
 
-    if (!runnerInfo) {
+    if (runnerInfo === undefined) {
       core.setFailed(
         `Could not load any runners. Please check that the organization and repository are correct.`
       )
