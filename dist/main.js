@@ -4,21 +4,18 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
-var __reExport = (target, module2, copyDefault, desc) => {
-  if (module2 && typeof module2 === "object" || typeof module2 === "function") {
-    for (let key of __getOwnPropNames(module2))
-      if (!__hasOwnProp.call(target, key) && (copyDefault || key !== "default"))
-        __defProp(target, key, { get: () => module2[key], enumerable: !(desc = __getOwnPropDesc(module2, key)) || desc.enumerable });
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
   }
-  return target;
+  return to;
 };
-var __toESM = (module2, isNodeMode) => {
-  return __reExport(__markAsModule(__defProp(module2 != null ? __create(__getProtoOf(module2)) : {}, "default", !isNodeMode && module2 && module2.__esModule ? { get: () => module2.default, enumerable: true } : { value: module2, enumerable: true })), module2);
-};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -1112,6 +1109,169 @@ var require_oidc_utils = __commonJS({
   }
 });
 
+// node_modules/@actions/core/lib/markdown-summary.js
+var require_markdown_summary = __commonJS({
+  "node_modules/@actions/core/lib/markdown-summary.js"(exports) {
+    "use strict";
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.markdownSummary = exports.SUMMARY_DOCS_URL = exports.SUMMARY_ENV_VAR = void 0;
+    var os_1 = require("os");
+    var fs_1 = require("fs");
+    var { access, appendFile, writeFile } = fs_1.promises;
+    exports.SUMMARY_ENV_VAR = "GITHUB_STEP_SUMMARY";
+    exports.SUMMARY_DOCS_URL = "https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#adding-a-markdown-summary";
+    var MarkdownSummary = class {
+      constructor() {
+        this._buffer = "";
+      }
+      filePath() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (this._filePath) {
+            return this._filePath;
+          }
+          const pathFromEnv = process.env[exports.SUMMARY_ENV_VAR];
+          if (!pathFromEnv) {
+            throw new Error(`Unable to find environment variable for $${exports.SUMMARY_ENV_VAR}. Check if your runtime environment supports markdown summaries.`);
+          }
+          try {
+            yield access(pathFromEnv, fs_1.constants.R_OK | fs_1.constants.W_OK);
+          } catch (_a) {
+            throw new Error(`Unable to access summary file: '${pathFromEnv}'. Check if the file has correct read/write permissions.`);
+          }
+          this._filePath = pathFromEnv;
+          return this._filePath;
+        });
+      }
+      wrap(tag, content, attrs = {}) {
+        const htmlAttrs = Object.entries(attrs).map(([key, value]) => ` ${key}="${value}"`).join("");
+        if (!content) {
+          return `<${tag}${htmlAttrs}>`;
+        }
+        return `<${tag}${htmlAttrs}>${content}</${tag}>`;
+      }
+      write(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+          const overwrite = !!(options === null || options === void 0 ? void 0 : options.overwrite);
+          const filePath = yield this.filePath();
+          const writeFunc = overwrite ? writeFile : appendFile;
+          yield writeFunc(filePath, this._buffer, { encoding: "utf8" });
+          return this.emptyBuffer();
+        });
+      }
+      clear() {
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.emptyBuffer().write({ overwrite: true });
+        });
+      }
+      stringify() {
+        return this._buffer;
+      }
+      isEmptyBuffer() {
+        return this._buffer.length === 0;
+      }
+      emptyBuffer() {
+        this._buffer = "";
+        return this;
+      }
+      addRaw(text, addEOL = false) {
+        this._buffer += text;
+        return addEOL ? this.addEOL() : this;
+      }
+      addEOL() {
+        return this.addRaw(os_1.EOL);
+      }
+      addCodeBlock(code, lang) {
+        const attrs = Object.assign({}, lang && { lang });
+        const element = this.wrap("pre", this.wrap("code", code), attrs);
+        return this.addRaw(element).addEOL();
+      }
+      addList(items, ordered = false) {
+        const tag = ordered ? "ol" : "ul";
+        const listItems = items.map((item) => this.wrap("li", item)).join("");
+        const element = this.wrap(tag, listItems);
+        return this.addRaw(element).addEOL();
+      }
+      addTable(rows) {
+        const tableBody = rows.map((row) => {
+          const cells = row.map((cell) => {
+            if (typeof cell === "string") {
+              return this.wrap("td", cell);
+            }
+            const { header, data, colspan, rowspan } = cell;
+            const tag = header ? "th" : "td";
+            const attrs = Object.assign(Object.assign({}, colspan && { colspan }), rowspan && { rowspan });
+            return this.wrap(tag, data, attrs);
+          }).join("");
+          return this.wrap("tr", cells);
+        }).join("");
+        const element = this.wrap("table", tableBody);
+        return this.addRaw(element).addEOL();
+      }
+      addDetails(label, content) {
+        const element = this.wrap("details", this.wrap("summary", label) + content);
+        return this.addRaw(element).addEOL();
+      }
+      addImage(src, alt, options) {
+        const { width, height } = options || {};
+        const attrs = Object.assign(Object.assign({}, width && { width }), height && { height });
+        const element = this.wrap("img", null, Object.assign({ src, alt }, attrs));
+        return this.addRaw(element).addEOL();
+      }
+      addHeading(text, level) {
+        const tag = `h${level}`;
+        const allowedTag = ["h1", "h2", "h3", "h4", "h5", "h6"].includes(tag) ? tag : "h1";
+        const element = this.wrap(allowedTag, text);
+        return this.addRaw(element).addEOL();
+      }
+      addSeparator() {
+        const element = this.wrap("hr", null);
+        return this.addRaw(element).addEOL();
+      }
+      addBreak() {
+        const element = this.wrap("br", null);
+        return this.addRaw(element).addEOL();
+      }
+      addQuote(text, cite) {
+        const attrs = Object.assign({}, cite && { cite });
+        const element = this.wrap("blockquote", text, attrs);
+        return this.addRaw(element).addEOL();
+      }
+      addLink(text, href) {
+        const element = this.wrap("a", text, { href });
+        return this.addRaw(element).addEOL();
+      }
+    };
+    exports.markdownSummary = new MarkdownSummary();
+  }
+});
+
 // node_modules/@actions/core/lib/core.js
 var require_core = __commonJS({
   "node_modules/@actions/core/lib/core.js"(exports) {
@@ -1312,6 +1472,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       });
     }
     exports.getIDToken = getIDToken;
+    var markdown_summary_1 = require_markdown_summary();
+    Object.defineProperty(exports, "markdownSummary", { enumerable: true, get: function() {
+      return markdown_summary_1.markdownSummary;
+    } });
   }
 });
 
@@ -4444,8 +4608,13 @@ var require_lib2 = __commonJS({
     AbortError.prototype = Object.create(Error.prototype);
     AbortError.prototype.constructor = AbortError;
     AbortError.prototype.name = "AbortError";
+    var URL$1 = Url.URL || whatwgUrl.URL;
     var PassThrough$1 = Stream.PassThrough;
-    var resolve_url = Url.resolve;
+    var isDomainOrSubdomain = function isDomainOrSubdomain2(destination, original) {
+      const orig = new URL$1(original).hostname;
+      const dest = new URL$1(destination).hostname;
+      return orig === dest || orig[orig.length - dest.length - 1] === "." && orig.endsWith(dest);
+    };
     function fetch(url, opts) {
       if (!fetch.Promise) {
         throw new Error("native promise missing, set fetch.Promise to your favorite alternative");
@@ -4503,7 +4672,16 @@ var require_lib2 = __commonJS({
           const headers = createHeadersLenient(res.headers);
           if (fetch.isRedirect(res.statusCode)) {
             const location = headers.get("Location");
-            const locationURL = location === null ? null : resolve_url(request.url, location);
+            let locationURL = null;
+            try {
+              locationURL = location === null ? null : new URL$1(location, request.url).toString();
+            } catch (err) {
+              if (request.redirect !== "manual") {
+                reject(new FetchError(`uri requested responds with an invalid redirect URL: ${location}`, "invalid-redirect"));
+                finalize();
+                return;
+              }
+            }
             switch (request.redirect) {
               case "error":
                 reject(new FetchError(`uri requested responds with a redirect, redirect mode is set to error: ${request.url}`, "no-redirect"));
@@ -4539,6 +4717,11 @@ var require_lib2 = __commonJS({
                   timeout: request.timeout,
                   size: request.size
                 };
+                if (!isDomainOrSubdomain(request.url, locationURL)) {
+                  for (const name of ["authorization", "www-authenticate", "cookie", "cookie2"]) {
+                    requestOpts.headers.delete(name);
+                  }
+                }
                 if (res.statusCode !== 303 && request.body && getTotalBytes(request) === null) {
                   reject(new FetchError("Cannot follow redirect with body being a readable stream", "unsupported-redirect"));
                   finalize();
@@ -14583,73 +14766,78 @@ var require_main = __commonJS({
     var fs = require("fs");
     var path = require("path");
     var os = require("os");
-    function log(message) {
-      console.log(`[dotenv][DEBUG] ${message}`);
-    }
-    var NEWLINE = "\n";
-    var RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/;
-    var RE_NEWLINES = /\\n/g;
-    var NEWLINES_MATCH = /\r\n|\n|\r/;
-    function parse(src, options) {
-      const debug2 = Boolean(options && options.debug);
+    var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
+    function parse(src) {
       const obj = {};
-      src.toString().split(NEWLINES_MATCH).forEach(function(line, idx) {
-        const keyValueArr = line.match(RE_INI_KEY_VAL);
-        if (keyValueArr != null) {
-          const key = keyValueArr[1];
-          let val = keyValueArr[2] || "";
-          const end = val.length - 1;
-          const isDoubleQuoted = val[0] === '"' && val[end] === '"';
-          const isSingleQuoted = val[0] === "'" && val[end] === "'";
-          if (isSingleQuoted || isDoubleQuoted) {
-            val = val.substring(1, end);
-            if (isDoubleQuoted) {
-              val = val.replace(RE_NEWLINES, NEWLINE);
-            }
-          } else {
-            val = val.trim();
-          }
-          obj[key] = val;
-        } else if (debug2) {
-          log(`did not match key and value when parsing line ${idx + 1}: ${line}`);
+      let lines = src.toString();
+      lines = lines.replace(/\r\n?/mg, "\n");
+      let match;
+      while ((match = LINE.exec(lines)) != null) {
+        const key = match[1];
+        let value = match[2] || "";
+        value = value.trim();
+        const maybeQuote = value[0];
+        value = value.replace(/^(['"`])([\s\S]*)\1$/mg, "$2");
+        if (maybeQuote === '"') {
+          value = value.replace(/\\n/g, "\n");
+          value = value.replace(/\\r/g, "\r");
         }
-      });
+        obj[key] = value;
+      }
       return obj;
     }
-    function resolveHome(envPath) {
+    function _log(message) {
+      console.log(`[dotenv][DEBUG] ${message}`);
+    }
+    function _resolveHome(envPath) {
       return envPath[0] === "~" ? path.join(os.homedir(), envPath.slice(1)) : envPath;
     }
     function config(options) {
       let dotenvPath = path.resolve(process.cwd(), ".env");
       let encoding = "utf8";
-      let debug2 = false;
+      const debug2 = Boolean(options && options.debug);
+      const override = Boolean(options && options.override);
       if (options) {
         if (options.path != null) {
-          dotenvPath = resolveHome(options.path);
+          dotenvPath = _resolveHome(options.path);
         }
         if (options.encoding != null) {
           encoding = options.encoding;
         }
-        if (options.debug != null) {
-          debug2 = true;
-        }
       }
       try {
-        const parsed = parse(fs.readFileSync(dotenvPath, { encoding }), { debug: debug2 });
+        const parsed = DotenvModule.parse(fs.readFileSync(dotenvPath, { encoding }));
         Object.keys(parsed).forEach(function(key) {
           if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
             process.env[key] = parsed[key];
-          } else if (debug2) {
-            log(`"${key}" is already defined in \`process.env\` and will not be overwritten`);
+          } else {
+            if (override === true) {
+              process.env[key] = parsed[key];
+            }
+            if (debug2) {
+              if (override === true) {
+                _log(`"${key}" is already defined in \`process.env\` and WAS overwritten`);
+              } else {
+                _log(`"${key}" is already defined in \`process.env\` and was NOT overwritten`);
+              }
+            }
           }
         });
         return { parsed };
       } catch (e) {
+        if (debug2) {
+          _log(`Failed to load ${dotenvPath} ${e.message}`);
+        }
         return { error: e };
       }
     }
-    module2.exports.config = config;
-    module2.exports.parse = parse;
+    var DotenvModule = {
+      config,
+      parse
+    };
+    module2.exports.config = DotenvModule.config;
+    module2.exports.parse = DotenvModule.parse;
+    module2.exports = DotenvModule;
   }
 });
 
