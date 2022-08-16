@@ -73,14 +73,21 @@ async function run(): Promise<void> {
       }
     }
 
-    console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`)
-    const json = JSON.stringify(runnerInfo)
-    core.setOutput('runners', json)
+    if (!runnerInfo) {
+      core.setFailed(
+        `Could not load any runners. Please check that the organization and repository are correct.`
+      )
+    }
+    else {
+      console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`)
+      const json = JSON.stringify(runnerInfo)
+      core.setOutput('runners', json)
 
-    const grouped = groupRunnersByLabel(runnerInfo)
-    console.log(`Found ${grouped.length} groups`)
-    const jsonGrouped = JSON.stringify(grouped)
-    core.setOutput('grouped', jsonGrouped)
+      const grouped = groupRunnersByLabel(runnerInfo)
+      console.log(`Found ${grouped.length} groups`)
+      const jsonGrouped = JSON.stringify(grouped)
+      core.setOutput('grouped', jsonGrouped)
+    }
 }
 
 run()

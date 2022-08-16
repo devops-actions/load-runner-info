@@ -14915,13 +14915,17 @@ function run() {
         return;
       }
     }
-    console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`);
-    const json = JSON.stringify(runnerInfo);
-    core.setOutput("runners", json);
-    const grouped = groupRunnersByLabel(runnerInfo);
-    console.log(`Found ${grouped.length} groups`);
-    const jsonGrouped = JSON.stringify(grouped);
-    core.setOutput("grouped", jsonGrouped);
+    if (!runnerInfo) {
+      core.setFailed(`Could not load any runners. Please check that the organization and repository are correct.`);
+    } else {
+      console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`);
+      const json = JSON.stringify(runnerInfo);
+      core.setOutput("runners", json);
+      const grouped = groupRunnersByLabel(runnerInfo);
+      console.log(`Found ${grouped.length} groups`);
+      const jsonGrouped = JSON.stringify(grouped);
+      core.setOutput("grouped", jsonGrouped);
+    }
   });
 }
 run();
