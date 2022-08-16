@@ -14893,8 +14893,8 @@ function run() {
         if (data) {
           console.log(`Found ${data.length} runners at the org level`);
           console.log(JSON.stringify(data));
-          runnerInfo = data;
         }
+        runnerInfo = data;
       } catch (error) {
         console.log(error);
         core.setFailed(`Could not authenticate with access token. Please check that it is correct and that it has the correct scope (see readme) to the organization: ${error}`);
@@ -14916,7 +14916,7 @@ function run() {
         return;
       }
     }
-    if (runnerInfo === void 0) {
+    if (!runnerInfo) {
       core.setFailed(`Could not load any runners. Please check that the organization and repository are correct.`);
     } else {
       console.log(`Found ${runnerInfo.length} runners`);
