@@ -14887,11 +14887,8 @@ function run() {
     if (organization !== "" && repo === "") {
       try {
         console.log(`Loading all runners from organization [${organization}]`);
-        let data;
-        yield octokit.paginate("GET /orgs/{owner}/actions/runners", {
+        const data = yield octokit.paginate("GET /orgs/{owner}/actions/runners", {
           owner: organization
-        }).then((runners) => {
-          data = runners;
         });
         if (data) {
           console.log(`Found ${data.total_count} runners at the org level`);
@@ -14918,7 +14915,7 @@ function run() {
         return;
       }
     }
-    console.log(`Found ${runnerInfo.total_count} runners`);
+    console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`);
     const json = JSON.stringify(runnerInfo);
     core.setOutput("runners", json);
     const grouped = groupRunnersByLabel(runnerInfo);

@@ -73,7 +73,7 @@ async function run(): Promise<void> {
       }
     }
 
-    console.log(`Found ${runnerInfo.total_count} runners`)
+    console.log(`Found ${runnerInfo.total_count} runners and loaded ${runnerInfo.runners.length} of them`)
     const json = JSON.stringify(runnerInfo)
     core.setOutput('runners', json)
 
