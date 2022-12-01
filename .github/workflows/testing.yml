@@ -39,7 +39,7 @@ jobs:
           name: runners-organization-${{ env.organization }}
           path: 'runners-**.json'
 
-      - uses: actions/github-script@v5
+      - uses: actions/github-script@v6
         name: Test runner info
         with: 
           script: |
