@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
 
       - name: "Run analysis"
-        uses: rajbos-actions/scorecard-action@v2.0.2 # tag=v1.1.1
+        uses: rajbos-actions/scorecard-action@v2.0.6 # tag=v1.1.1
         with:
           results_file: results.sarif
           results_format: sarif
