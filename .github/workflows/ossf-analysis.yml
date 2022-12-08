@@ -9,7 +9,7 @@ on:
     branches: main
   workflow_dispatch:
     
-# Declare default permissions as read only.
+# Declare default  GITHUB_TOKEN permissions as read only.
 permissions: read-all
 
 jobs:
