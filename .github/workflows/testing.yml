@@ -9,6 +9,9 @@ env:
   organization: devops-actions
   repo: load-runner-info
 
+# Declare default GITHUB_TOKEN permissions as read only.
+permissions: read-all
+
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
