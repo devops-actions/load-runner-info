@@ -2,8 +2,7 @@
 Load the information for the runners that are available for the organization or the repository, including status checks.
 Can be used to verify the amount of runners for a label is as expected.
 
-[![OpenSSF Scorecard]
-(https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info/badge)](https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info/badge)](https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info)
 
 # Example
 Basic usage:
