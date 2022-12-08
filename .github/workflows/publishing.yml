@@ -8,12 +8,16 @@ on:
 env:
   organization: devops-actions
   repo: load-runner-info
+
+# Declare default GITHUB_TOKEN permissions as read only.
+permissions: read-all
    
 jobs:
   test-from-organization:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - uses: ./
         id: load-runner-info-org
         with: 
