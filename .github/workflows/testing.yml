@@ -2,6 +2,11 @@ name: Testing the action
 
 on: 
   push:
+    paths:
+      - ".github/workflows/testing.yml"
+      - "/lib/*"
+      - "/src/*"
+      - "/action.yml"
 
   workflow_dispatch:
 
