@@ -16,7 +16,7 @@ jobs:
   test-from-organization:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
       
       - uses: ./
         id: load-runner-info-org
@@ -35,7 +35,7 @@ jobs:
           name: runners-organization-${{ env.organization }}
           path: 'runners-**.json'
 
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0 # v6.3.3
         name: Test runner info
         with: 
           script: |
@@ -80,7 +80,7 @@ jobs:
       contents: write
     steps:
       # get code
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
       # build it
       - run: |
@@ -90,10 +90,10 @@ jobs:
       # get tag for this release
       - name: Get tag value
         id: tag
-        uses: rajbos-actions/action-get-tag@v1   
+        uses: rajbos-actions/action-get-tag@12319896edaa290b27558e34a177804e9b8d077b # v1   
 
       # publish a release with the build assets
-      - uses: rajbos-actions/action-gh-release@v1
+      - uses: rajbos-actions/action-gh-release@6034af24fba4e5a8e975aaa6056554efe4c794d0 # v1
         id: publish
         with:
           name: Release ${{ steps.tag.outputs.tag }}
@@ -107,7 +107,7 @@ jobs:
         env:
           url: ${{ steps.publish.outputs.url }}
 
-      - uses: rajbos-actions/slack@v1
+      - uses: rajbos-actions/slack@e4e71685b9b239384b0f676a63c32367f59c2522 # v1.2.2
         with: 
           status: ${{ job.status }}
         env:
