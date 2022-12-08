@@ -3,8 +3,7 @@ Load the information for the runners that are available for the organization or 
 Can be used to verify the amount of runners for a label is as expected.
 
 [![OpenSSF Scorecard]
-(https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info/badge)]
-(https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info)
+(https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info/badge)](https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info)
 
 # Example
 Basic usage:
