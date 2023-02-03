@@ -1,0 +1,53 @@
+name: Build the action
+
+on: 
+  pull_request: 
+
+  workflow_dispatch:
+
+# Declare default GITHUB_TOKEN permissions as read only.
+permissions: read-all
+    
+jobs:
+  build: # make sure build/ci work properly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - name: Compile with NPM
+        run: |
+          npm ci
+          npm run all
+      
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@c090f4e553673e6e505ea70d6a95362ee12adb94 # v3.0.3
+
+  update-dist:
+    runs-on: ubuntu-latest
+    needs: [build, dependency-check]
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    steps:    
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - name: Compile with NPM
+        run: |
+          npm ci
+          npm run all
+
+      - name: Commit changes if any
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then 
+            echo "Found changes to commit"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git config --global user.name "github-actions[bot]"
+
+            git add dist/
+            git commit -m "Update dist folder"
+            git push
+          fi
+
+
+
