@@ -7,7 +7,7 @@ Can be used to verify the amount of runners for a label is as expected.
 # Example
 Basic usage:
 ``` yaml
-      - uses: devops-actions/load-runner-info@main
+      - uses: devops-actions/load-runner-info@v1.0.6
         id: load-runner-info-org
         with: 
           accessToken: ${{ secrets.PAT }}
@@ -86,7 +86,7 @@ jobs:
   test-from-organization:
     runs-on: ubuntu-latest
     steps:
-      - uses: devops-actions/load-runner-info@main
+      - uses: devops-actions/load-runner-info@v1.0.6
         id: load-runner-info-org
         with: 
           accessToken: ${{ secrets.PAT }}
