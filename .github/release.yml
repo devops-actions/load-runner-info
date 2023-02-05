@@ -1,0 +1,12 @@
+changelog:
+  categories:
+    - title: Improvements
+      labels:
+        - Semver-Minor
+        - enhancement
+    - title: Dependency updates
+      labels:
+        - dependencies
+    - title: Other Changes
+      labels:
+        - "*"
