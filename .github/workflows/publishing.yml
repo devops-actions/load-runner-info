@@ -107,7 +107,7 @@ jobs:
         env:
           url: ${{ steps.publish.outputs.url }}
 
-      - uses: rajbos-actions/slack@e4e71685b9b239384b0f676a63c32367f59c2522 # v1.2.2
+      - uses: rajbos-actions/slack@ed1309ab9862e57e9e583e51c7889486b9a00b0f # v2.0.0
         with: 
           status: ${{ job.status }}
         env:
