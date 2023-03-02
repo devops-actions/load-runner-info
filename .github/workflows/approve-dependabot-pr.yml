@@ -8,5 +8,5 @@ permissions:
 jobs:
   dependabot:
     uses: devops-actions/.github/.github/workflows/approve-dependabot-pr.yml@main
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #secrets:
+    #  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
