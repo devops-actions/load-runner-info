@@ -1,0 +1,22 @@
+name: Auto Assign
+on:
+  issues:
+    types: [opened, edited, labeled, unlabeled]
+  pull_request:
+    types: [opened, edited, labeled, unlabeled]
+
+permissions:
+  contents: none
+  issues: write
+  pull-requests: write
+  
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: wow-actions/auto-assign@67fafa03df61d7e5f201734a2fa60d1ab111880d #v3.0.2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          reviewers: rajbos
+          assignees: rajbos
+          skipKeywords: wip, draft
