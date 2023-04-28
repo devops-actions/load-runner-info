@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import {Octokit} from 'octokit'
 import dotenv from 'dotenv'
 import { groupRunnersByLabel } from './grouping'
+import fs from 'fs'
 
 // always import the config
 dotenv.config()
@@ -86,11 +87,27 @@ async function run(): Promise<void> {
       const json = JSON.stringify(runnerInfo)
       core.setOutput('runners', json)
 
+      // write json to file
+      const fileName = 'runners.json' 
+      writeJsonToFile(json, fileName)
+      core.setOutput('runners-file-location', fileName)
+
       const grouped = groupRunnersByLabel(runnerInfo)
       console.log(`Found ${grouped.length} groups`)
       const jsonGrouped = JSON.stringify(grouped)
       core.setOutput('grouped', jsonGrouped)
+
+      // write json to file     
+      const groupedFileName = 'runners-grouped.json' 
+      writeJsonToFile(jsonGrouped, groupedFileName)
+      core.setOutput('grouped-file-location', groupedFileName)
     }
+
+  function writeJsonToFile(json: string, fileName: string) {    
+    fs.writeFile(fileName, json, function (err: any) {
+      core.error(`Error writing to file [${fileName}]:` + err)
+    })
+  }
 }
 
 run()
