@@ -87,7 +87,7 @@ jobs:
 
       - name: Test if result files are not empty
         run: |
-          runnersFile=${{ steps.load-runner-info-org.outputs.runner-file-location }}
+          runnersFile=${{ steps.load-runner-info-org.outputs.runners-file-location }}
           if [ ! -s $runnersFile ]; then
             echo "File [$runnersFile] is empty"
             exit 1
