@@ -755,18 +755,18 @@ var require_tunnel = __commonJS({
             res.statusCode
           );
           socket.destroy();
-          var error2 = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
-          error2.code = "ECONNRESET";
-          options.request.emit("error", error2);
+          var error = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
+          error.code = "ECONNRESET";
+          options.request.emit("error", error);
           self2.removeSocket(placeholder);
           return;
         }
         if (head.length > 0) {
           debug2("got illegal response body from proxy");
           socket.destroy();
-          var error2 = new Error("got illegal response body from proxy");
-          error2.code = "ECONNRESET";
-          options.request.emit("error", error2);
+          var error = new Error("got illegal response body from proxy");
+          error.code = "ECONNRESET";
+          options.request.emit("error", error);
           self2.removeSocket(placeholder);
           return;
         }
@@ -781,9 +781,9 @@ var require_tunnel = __commonJS({
           cause.message,
           cause.stack
         );
-        var error2 = new Error("tunneling socket could not be established, cause=" + cause.message);
-        error2.code = "ECONNRESET";
-        options.request.emit("error", error2);
+        var error = new Error("tunneling socket could not be established, cause=" + cause.message);
+        error.code = "ECONNRESET";
+        options.request.emit("error", error);
         self2.removeSocket(placeholder);
       }
     };
@@ -1610,12 +1610,12 @@ var require_oidc_utils = __commonJS({
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
           const httpclient = OidcClient.createHttpClient();
-          const res = yield httpclient.getJson(id_token_url).catch((error2) => {
+          const res = yield httpclient.getJson(id_token_url).catch((error) => {
             throw new Error(`Failed to get ID Token. 
  
-        Error Code : ${error2.statusCode}
+        Error Code : ${error.statusCode}
  
-        Error Message: ${error2.result.message}`);
+        Error Message: ${error.result.message}`);
           });
           const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
           if (!id_token) {
@@ -1636,8 +1636,8 @@ var require_oidc_utils = __commonJS({
             const id_token = yield OidcClient.getCall(id_token_url);
             core_1.setSecret(id_token);
             return id_token;
-          } catch (error2) {
-            throw new Error(`Error message: ${error2.message}`);
+          } catch (error) {
+            throw new Error(`Error message: ${error.message}`);
           }
         });
       }
@@ -1974,7 +1974,7 @@ var require_path_utils = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.toPlatformPath = exports.toWin32Path = exports.toPosixPath = void 0;
-    var path = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     function toPosixPath(pth) {
       return pth.replace(/[\\]/g, "/");
     }
@@ -1984,7 +1984,7 @@ var require_path_utils = __commonJS({
     }
     exports.toWin32Path = toWin32Path;
     function toPlatformPath(pth) {
-      return pth.replace(/[/\\]/g, path.sep);
+      return pth.replace(/[/\\]/g, path2.sep);
     }
     exports.toPlatformPath = toPlatformPath;
   }
@@ -2055,7 +2055,7 @@ var require_core = __commonJS({
     var file_command_1 = require_file_command();
     var utils_1 = require_utils();
     var os = __importStar(require("os"));
-    var path = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var oidc_utils_1 = require_oidc_utils();
     var ExitCode;
     (function(ExitCode2) {
@@ -2083,7 +2083,7 @@ var require_core = __commonJS({
       } else {
         command_1.issueCommand("add-path", {}, inputPath);
       }
-      process.env["PATH"] = `${inputPath}${path.delimiter}${process.env["PATH"]}`;
+      process.env["PATH"] = `${inputPath}${path2.delimiter}${process.env["PATH"]}`;
     }
     exports.addPath = addPath;
     function getInput2(name, options) {
@@ -2132,7 +2132,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
     exports.setCommandEcho = setCommandEcho;
     function setFailed2(message) {
       process.exitCode = ExitCode.Failure;
-      error2(message);
+      error(message);
     }
     exports.setFailed = setFailed2;
     function isDebug() {
@@ -2143,10 +2143,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("debug", {}, message);
     }
     exports.debug = debug2;
-    function error2(message, properties = {}) {
+    function error(message, properties = {}) {
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
-    exports.error = error2;
+    exports.error = error;
     function warning(message, properties = {}) {
       command_1.issueCommand("warning", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
@@ -2292,8 +2292,8 @@ var require_add = __commonJS({
       }
       if (kind === "error") {
         hook = function(method, options) {
-          return Promise.resolve().then(method.bind(null, options)).catch(function(error2) {
-            return orig(error2, options);
+          return Promise.resolve().then(method.bind(null, options)).catch(function(error) {
+            return orig(error, options);
           });
         };
       }
@@ -2978,21 +2978,21 @@ var require_tr46 = __commonJS({
         label = punycode.toUnicode(label);
         processing_option = PROCESSING_OPTIONS.NONTRANSITIONAL;
       }
-      var error2 = false;
+      var error = false;
       if (normalize(label) !== label || label[3] === "-" && label[4] === "-" || label[0] === "-" || label[label.length - 1] === "-" || label.indexOf(".") !== -1 || label.search(combiningMarksRegex) === 0) {
-        error2 = true;
+        error = true;
       }
       var len = countSymbols(label);
       for (var i = 0; i < len; ++i) {
         var status = findStatus(label.codePointAt(i));
         if (processing === PROCESSING_OPTIONS.TRANSITIONAL && status[1] !== "valid" || processing === PROCESSING_OPTIONS.NONTRANSITIONAL && status[1] !== "valid" && status[1] !== "deviation") {
-          error2 = true;
+          error = true;
           break;
         }
       }
       return {
         label,
-        error: error2
+        error
       };
     }
     function processing(domain_name, useSTD3, processing_option) {
@@ -3441,14 +3441,14 @@ var require_url_state_machine = __commonJS({
       return url.replace(/\u0009|\u000A|\u000D/g, "");
     }
     function shortenPath(url) {
-      const path = url.path;
-      if (path.length === 0) {
+      const path2 = url.path;
+      if (path2.length === 0) {
         return;
       }
-      if (url.scheme === "file" && path.length === 1 && isNormalizedWindowsDriveLetter(path[0])) {
+      if (url.scheme === "file" && path2.length === 1 && isNormalizedWindowsDriveLetter(path2[0])) {
         return;
       }
-      path.pop();
+      path2.pop();
     }
     function includesCredentials(url) {
       return url.username !== "" || url.password !== "";
@@ -4644,8 +4644,8 @@ var require_lib3 = __commonJS({
       this.timeout = timeout;
       if (body instanceof Stream) {
         body.on("error", function(err) {
-          const error2 = err.name === "AbortError" ? err : new FetchError(`Invalid response body while trying to fetch ${_this.url}: ${err.message}`, "system", err);
-          _this[INTERNALS].error = error2;
+          const error = err.name === "AbortError" ? err : new FetchError(`Invalid response body while trying to fetch ${_this.url}: ${err.message}`, "system", err);
+          _this[INTERNALS].error = error;
         });
       }
     }
@@ -5493,14 +5493,14 @@ var require_lib3 = __commonJS({
         const signal = request.signal;
         let response = null;
         const abort = function abort2() {
-          let error2 = new AbortError("The user aborted a request.");
-          reject(error2);
+          let error = new AbortError("The user aborted a request.");
+          reject(error);
           if (request.body && request.body instanceof Stream.Readable) {
-            destroyStream(request.body, error2);
+            destroyStream(request.body, error);
           }
           if (!response || !response.body)
             return;
-          response.body.emit("error", error2);
+          response.body.emit("error", error);
         };
         if (signal && signal.aborted) {
           abort();
@@ -5954,7 +5954,7 @@ var require_dist_node5 = __commonJS({
         }
         if (status >= 400) {
           const data = await getResponseData(response);
-          const error2 = new requestError.RequestError(toErrorMessage(data), status, {
+          const error = new requestError.RequestError(toErrorMessage(data), status, {
             response: {
               url,
               status,
@@ -5963,7 +5963,7 @@ var require_dist_node5 = __commonJS({
             },
             request: requestOptions
           });
-          throw error2;
+          throw error;
         }
         return getResponseData(response);
       }).then((data) => {
@@ -5973,12 +5973,12 @@ var require_dist_node5 = __commonJS({
           headers,
           data
         };
-      }).catch((error2) => {
-        if (error2 instanceof requestError.RequestError)
-          throw error2;
-        else if (error2.name === "AbortError")
-          throw error2;
-        throw new requestError.RequestError(error2.message, 500, {
+      }).catch((error) => {
+        if (error instanceof requestError.RequestError)
+          throw error;
+        else if (error.name === "AbortError")
+          throw error;
+        throw new requestError.RequestError(error.message, 500, {
           request: requestOptions
         });
       });
@@ -6352,9 +6352,9 @@ var require_dist_node9 = __commonJS({
               return {
                 value: normalizedResponse
               };
-            } catch (error2) {
-              if (error2.status !== 409)
-                throw error2;
+            } catch (error) {
+              if (error.status !== 409)
+                throw error;
               url = "";
               return {
                 value: {
@@ -7684,8 +7684,8 @@ var require_light = __commonJS({
                 } else {
                   return returned;
                 }
-              } catch (error2) {
-                e2 = error2;
+              } catch (error) {
+                e2 = error;
                 {
                   this.trigger("error", e2);
                 }
@@ -7695,8 +7695,8 @@ var require_light = __commonJS({
             return (await Promise.all(promises)).find(function(x) {
               return x != null;
             });
-          } catch (error2) {
-            e = error2;
+          } catch (error) {
+            e = error;
             {
               this.trigger("error", e);
             }
@@ -7808,10 +7808,10 @@ var require_light = __commonJS({
         _randomIndex() {
           return Math.random().toString(36).slice(2);
         }
-        doDrop({ error: error2, message = "This job has been dropped by Bottleneck" } = {}) {
+        doDrop({ error, message = "This job has been dropped by Bottleneck" } = {}) {
           if (this._states.remove(this.options.id)) {
             if (this.rejectOnDrop) {
-              this._reject(error2 != null ? error2 : new BottleneckError$1(message));
+              this._reject(error != null ? error : new BottleneckError$1(message));
             }
             this.Events.trigger("dropped", { args: this.args, options: this.options, task: this.task, promise: this.promise });
             return true;
@@ -7845,7 +7845,7 @@ var require_light = __commonJS({
           return this.Events.trigger("scheduled", { args: this.args, options: this.options });
         }
         async doExecute(chained, clearGlobalState, run2, free) {
-          var error2, eventInfo, passed;
+          var error, eventInfo, passed;
           if (this.retryCount === 0) {
             this._assertStatus("RUNNING");
             this._states.next(this.options.id);
@@ -7863,24 +7863,24 @@ var require_light = __commonJS({
               return this._resolve(passed);
             }
           } catch (error1) {
-            error2 = error1;
-            return this._onFailure(error2, eventInfo, clearGlobalState, run2, free);
+            error = error1;
+            return this._onFailure(error, eventInfo, clearGlobalState, run2, free);
           }
         }
         doExpire(clearGlobalState, run2, free) {
-          var error2, eventInfo;
+          var error, eventInfo;
           if (this._states.jobStatus(this.options.id === "RUNNING")) {
             this._states.next(this.options.id);
           }
           this._assertStatus("EXECUTING");
           eventInfo = { args: this.args, options: this.options, retryCount: this.retryCount };
-          error2 = new BottleneckError$1(`This job timed out after ${this.options.expiration} ms.`);
-          return this._onFailure(error2, eventInfo, clearGlobalState, run2, free);
+          error = new BottleneckError$1(`This job timed out after ${this.options.expiration} ms.`);
+          return this._onFailure(error, eventInfo, clearGlobalState, run2, free);
         }
-        async _onFailure(error2, eventInfo, clearGlobalState, run2, free) {
+        async _onFailure(error, eventInfo, clearGlobalState, run2, free) {
           var retry, retryAfter;
           if (clearGlobalState()) {
-            retry = await this.Events.trigger("failed", error2, eventInfo);
+            retry = await this.Events.trigger("failed", error, eventInfo);
             if (retry != null) {
               retryAfter = ~~retry;
               this.Events.trigger("retry", `Retrying ${this.options.id} after ${retryAfter} ms`, eventInfo);
@@ -7890,7 +7890,7 @@ var require_light = __commonJS({
               this.doDone(eventInfo);
               await free(this.options, eventInfo);
               this._assertStatus("DONE");
-              return this._reject(error2);
+              return this._reject(error);
             }
           }
         }
@@ -8169,7 +8169,7 @@ var require_light = __commonJS({
           return this._queue.length === 0;
         }
         async _tryToRun() {
-          var args, cb, error2, reject, resolve, returned, task;
+          var args, cb, error, reject, resolve, returned, task;
           if (this._running < 1 && this._queue.length > 0) {
             this._running++;
             ({ task, args, resolve, reject } = this._queue.shift());
@@ -8180,9 +8180,9 @@ var require_light = __commonJS({
                   return resolve(returned);
                 };
               } catch (error1) {
-                error2 = error1;
+                error = error1;
                 return function() {
-                  return reject(error2);
+                  return reject(error);
                 };
               }
             }();
@@ -8316,8 +8316,8 @@ var require_light = __commonJS({
                   } else {
                     results.push(void 0);
                   }
-                } catch (error2) {
-                  e = error2;
+                } catch (error) {
+                  e = error;
                   results.push(v.Events.trigger("error", e));
                 }
               }
@@ -8650,14 +8650,14 @@ var require_light = __commonJS({
             return done;
           }
           async _addToQueue(job) {
-            var args, blocked, error2, options, reachedHWM, shifted, strategy;
+            var args, blocked, error, options, reachedHWM, shifted, strategy;
             ({ args, options } = job);
             try {
               ({ reachedHWM, blocked, strategy } = await this._store.__submit__(this.queued(), options.weight));
             } catch (error1) {
-              error2 = error1;
-              this.Events.trigger("debug", `Could not queue ${options.id}`, { args, options, error: error2 });
-              job.doDrop({ error: error2 });
+              error = error1;
+              this.Events.trigger("debug", `Could not queue ${options.id}`, { args, options, error });
+              job.doDrop({ error });
               return false;
             }
             if (blocked) {
@@ -8833,22 +8833,22 @@ var require_dist_node11 = __commonJS({
     }
     var Bottleneck = _interopDefault(require_light());
     var requestError = require_dist_node4();
-    async function errorRequest(octokit, state, error2, options) {
-      if (!error2.request || !error2.request.request) {
-        throw error2;
+    async function errorRequest(octokit, state, error, options) {
+      if (!error.request || !error.request.request) {
+        throw error;
       }
-      if (error2.status >= 400 && !state.doNotRetry.includes(error2.status)) {
+      if (error.status >= 400 && !state.doNotRetry.includes(error.status)) {
         const retries = options.request.retries != null ? options.request.retries : state.retries;
         const retryAfter = Math.pow((options.request.retryCount || 0) + 1, 2);
-        throw octokit.retry.retryRequest(error2, retries, retryAfter);
+        throw octokit.retry.retryRequest(error, retries, retryAfter);
       }
-      throw error2;
+      throw error;
     }
     async function wrapRequest(state, request, options) {
       const limiter = new Bottleneck();
-      limiter.on("failed", function(error2, info) {
-        const maxRetries = ~~error2.request.request.retries;
-        const after = ~~error2.request.request.retryAfter;
+      limiter.on("failed", function(error, info) {
+        const maxRetries = ~~error.request.request.retries;
+        const after = ~~error.request.request.retryAfter;
         options.request.retryCount = info.retryCount + 1;
         if (maxRetries > info.retryCount) {
           return after * state.retryAfterBaseValue;
@@ -8859,11 +8859,11 @@ var require_dist_node11 = __commonJS({
     async function requestWithGraphqlErrorHandling(request, options) {
       const response = await request(request, options);
       if (response.data && response.data.errors && /Something went wrong while executing your query/.test(response.data.errors[0].message)) {
-        const error2 = new requestError.RequestError(response.data.errors[0].message, 500, {
+        const error = new requestError.RequestError(response.data.errors[0].message, 500, {
           request: options,
           response
         });
-        throw error2;
+        throw error;
       }
       return response;
     }
@@ -8881,12 +8881,12 @@ var require_dist_node11 = __commonJS({
       }
       return {
         retry: {
-          retryRequest: (error2, retries, retryAfter) => {
-            error2.request.request = Object.assign({}, error2.request.request, {
+          retryRequest: (error, retries, retryAfter) => {
+            error.request.request = Object.assign({}, error.request.request, {
               retries,
               retryAfter
             });
-            return error2;
+            return error;
           }
         }
       };
@@ -8939,19 +8939,19 @@ var require_dist_node12 = __commonJS({
       if (isGraphQL) {
         const res = await req;
         if (res.data.errors != null && // @ts-expect-error
-        res.data.errors.some((error2) => error2.type === "RATE_LIMITED")) {
-          const error2 = Object.assign(new Error("GraphQL Rate Limit Exceeded"), {
+        res.data.errors.some((error) => error.type === "RATE_LIMITED")) {
+          const error = Object.assign(new Error("GraphQL Rate Limit Exceeded"), {
             response: res,
             data: res.data
           });
-          throw error2;
+          throw error;
         }
       }
       return req;
     }
     var triggersNotificationPaths = ["/orgs/{org}/invitations", "/orgs/{org}/invitations/{invitation_id}", "/orgs/{org}/teams/{team_slug}/discussions", "/orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments", "/repos/{owner}/{repo}/collaborators/{username}", "/repos/{owner}/{repo}/commits/{commit_sha}/comments", "/repos/{owner}/{repo}/issues", "/repos/{owner}/{repo}/issues/{issue_number}/comments", "/repos/{owner}/{repo}/pulls", "/repos/{owner}/{repo}/pulls/{pull_number}/comments", "/repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies", "/repos/{owner}/{repo}/pulls/{pull_number}/merge", "/repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers", "/repos/{owner}/{repo}/pulls/{pull_number}/reviews", "/repos/{owner}/{repo}/releases", "/teams/{team_id}/discussions", "/teams/{team_id}/discussions/{discussion_number}/comments"];
     function routeMatcher(paths) {
-      const regexes = paths.map((path) => path.split("/").map((c) => c.startsWith("{") ? "(?:.+?)" : c).join("/"));
+      const regexes = paths.map((path2) => path2.split("/").map((c) => c.startsWith("{") ? "(?:.+?)" : c).join("/"));
       const regex2 = `^(?:${regexes.map((r) => `(?:${r})`).join("|")})[^/]*$`;
       return new RegExp(regex2, "i");
     }
@@ -9033,13 +9033,13 @@ var require_dist_node12 = __commonJS({
       } : state.onSecondaryRateLimit);
       events.on("rate-limit", state.onRateLimit);
       events.on("error", (e) => octokit.log.warn("Error in throttling-plugin limit handler", e));
-      state.retryLimiter.on("failed", async function(error2, info) {
+      state.retryLimiter.on("failed", async function(error, info) {
         const [state2, request, options] = info.args;
         const {
           pathname
         } = new URL(options.url, "http://github.test");
-        const shouldRetryGraphQL = pathname.startsWith("/graphql") && error2.status !== 401;
-        if (!(shouldRetryGraphQL || error2.status === 403)) {
+        const shouldRetryGraphQL = pathname.startsWith("/graphql") && error.status !== 401;
+        if (!(shouldRetryGraphQL || error.status === 403)) {
           return;
         }
         const retryCount = ~~request.retryCount;
@@ -9049,16 +9049,16 @@ var require_dist_node12 = __commonJS({
           wantRetry,
           retryAfter = 0
         } = await async function() {
-          if (/\bsecondary rate\b/i.test(error2.message)) {
-            const retryAfter2 = Math.max(~~error2.response.headers["retry-after"], state2.minimumSecondaryRateRetryAfter);
+          if (/\bsecondary rate\b/i.test(error.message)) {
+            const retryAfter2 = Math.max(~~error.response.headers["retry-after"], state2.minimumSecondaryRateRetryAfter);
             const wantRetry2 = await emitter.trigger("secondary-limit", retryAfter2, options, octokit, retryCount);
             return {
               wantRetry: wantRetry2,
               retryAfter: retryAfter2
             };
           }
-          if (error2.response.headers != null && error2.response.headers["x-ratelimit-remaining"] === "0") {
-            const rateLimitReset = new Date(~~error2.response.headers["x-ratelimit-reset"] * 1e3).getTime();
+          if (error.response.headers != null && error.response.headers["x-ratelimit-remaining"] === "0") {
+            const rateLimitReset = new Date(~~error.response.headers["x-ratelimit-reset"] * 1e3).getTime();
             const retryAfter2 = Math.max(Math.ceil((rateLimitReset - Date.now()) / 1e3), 0);
             const wantRetry2 = await emitter.trigger("rate-limit", retryAfter2, options, octokit, retryCount);
             return {
@@ -9168,12 +9168,12 @@ var require_dist_node14 = __commonJS({
       };
       const response = await request2(route, withOAuthParameters);
       if ("error" in response.data) {
-        const error2 = new requestError.RequestError(`${response.data.error_description} (${response.data.error}, ${response.data.error_uri})`, 400, {
+        const error = new requestError.RequestError(`${response.data.error_description} (${response.data.error}, ${response.data.error_uri})`, 400, {
           request: request2.endpoint.merge(route, withOAuthParameters),
           headers: response.headers
         });
-        error2.response = response;
-        throw error2;
+        error.response = response;
+        throw error;
       }
       return response;
     }
@@ -9476,10 +9476,10 @@ var require_dist_node15 = __commonJS({
           tokenType: "oauth",
           ...authentication
         };
-      } catch (error2) {
-        if (!error2.response)
-          throw error2;
-        const errorType = error2.response.data.error;
+      } catch (error) {
+        if (!error.response)
+          throw error;
+        const errorType = error.response.data.error;
         if (errorType === "authorization_pending") {
           await wait(verification.interval);
           return waitForAccessToken(request2, clientId, clientType, verification);
@@ -9488,7 +9488,7 @@ var require_dist_node15 = __commonJS({
           await wait(verification.interval + 5);
           return waitForAccessToken(request2, clientId, clientType, verification);
         }
-        throw error2;
+        throw error;
       }
     }
     async function auth(state, authOptions) {
@@ -9672,12 +9672,12 @@ var require_dist_node16 = __commonJS({
             }));
           }
           return state.authentication;
-        } catch (error2) {
-          if (error2.status === 404) {
-            error2.message = "[@octokit/auth-oauth-user] Token is invalid";
+        } catch (error) {
+          if (error.status === 404) {
+            error.message = "[@octokit/auth-oauth-user] Token is invalid";
             state.authentication.invalid = true;
           }
-          throw error2;
+          throw error;
         }
       }
       if (options.type === "delete" || options.type === "deleteAuthorization") {
@@ -9691,9 +9691,9 @@ var require_dist_node16 = __commonJS({
             token: state.authentication.token,
             request: state.request
           });
-        } catch (error2) {
-          if (error2.status !== 404)
-            throw error2;
+        } catch (error) {
+          if (error.status !== 404)
+            throw error;
         }
         state.authentication.invalid = true;
         return state.authentication;
@@ -9818,11 +9818,11 @@ var require_dist_node17 = __commonJS({
       endpoint.headers.authorization = `basic ${credentials}`;
       try {
         return await request2(endpoint);
-      } catch (error2) {
-        if (error2.status !== 401)
-          throw error2;
-        error2.message = `[@octokit/auth-oauth-app] "${endpoint.method} ${endpoint.url}" does not support clientId/clientSecret basic authentication.`;
-        throw error2;
+      } catch (error) {
+        if (error.status !== 401)
+          throw error;
+        error.message = `[@octokit/auth-oauth-app] "${endpoint.method} ${endpoint.url}" does not support clientId/clientSecret basic authentication.`;
+        throw error;
       }
     }
     var VERSION = "5.0.5";
@@ -9852,15 +9852,15 @@ var require_dist_node17 = __commonJS({
 // node_modules/jsonwebtoken/lib/JsonWebTokenError.js
 var require_JsonWebTokenError = __commonJS({
   "node_modules/jsonwebtoken/lib/JsonWebTokenError.js"(exports, module2) {
-    var JsonWebTokenError = function(message, error2) {
+    var JsonWebTokenError = function(message, error) {
       Error.call(this, message);
       if (Error.captureStackTrace) {
         Error.captureStackTrace(this, this.constructor);
       }
       this.name = "JsonWebTokenError";
       this.message = message;
-      if (error2)
-        this.inner = error2;
+      if (error)
+        this.inner = error;
     };
     JsonWebTokenError.prototype = Object.create(Error.prototype);
     JsonWebTokenError.prototype.constructor = JsonWebTokenError;
@@ -14797,11 +14797,11 @@ var require_lodash = __commonJS({
             return isFunction(object[key]);
           });
         }
-        function baseGet(object, path) {
-          path = castPath(path, object);
-          var index = 0, length = path.length;
+        function baseGet(object, path2) {
+          path2 = castPath(path2, object);
+          var index = 0, length = path2.length;
           while (object != null && index < length) {
-            object = object[toKey(path[index++])];
+            object = object[toKey(path2[index++])];
           }
           return index && index == length ? object : undefined2;
         }
@@ -14865,10 +14865,10 @@ var require_lodash = __commonJS({
           });
           return accumulator;
         }
-        function baseInvoke(object, path, args) {
-          path = castPath(path, object);
-          object = parent(object, path);
-          var func = object == null ? object : object[toKey(last(path))];
+        function baseInvoke(object, path2, args) {
+          path2 = castPath(path2, object);
+          object = parent(object, path2);
+          var func = object == null ? object : object[toKey(last(path2))];
           return func == null ? undefined2 : apply(func, object, args);
         }
         function baseIsArguments(value) {
@@ -15024,13 +15024,13 @@ var require_lodash = __commonJS({
             return object === source || baseIsMatch(object, source, matchData);
           };
         }
-        function baseMatchesProperty(path, srcValue) {
-          if (isKey(path) && isStrictComparable(srcValue)) {
-            return matchesStrictComparable(toKey(path), srcValue);
+        function baseMatchesProperty(path2, srcValue) {
+          if (isKey(path2) && isStrictComparable(srcValue)) {
+            return matchesStrictComparable(toKey(path2), srcValue);
           }
           return function(object) {
-            var objValue = get(object, path);
-            return objValue === undefined2 && objValue === srcValue ? hasIn(object, path) : baseIsEqual(srcValue, objValue, COMPARE_PARTIAL_FLAG | COMPARE_UNORDERED_FLAG);
+            var objValue = get(object, path2);
+            return objValue === undefined2 && objValue === srcValue ? hasIn(object, path2) : baseIsEqual(srcValue, objValue, COMPARE_PARTIAL_FLAG | COMPARE_UNORDERED_FLAG);
           };
         }
         function baseMerge(object, source, srcIndex, customizer, stack) {
@@ -15127,23 +15127,23 @@ var require_lodash = __commonJS({
           });
         }
         function basePick(object, paths) {
-          return basePickBy(object, paths, function(value, path) {
-            return hasIn(object, path);
+          return basePickBy(object, paths, function(value, path2) {
+            return hasIn(object, path2);
           });
         }
         function basePickBy(object, paths, predicate) {
           var index = -1, length = paths.length, result2 = {};
           while (++index < length) {
-            var path = paths[index], value = baseGet(object, path);
-            if (predicate(value, path)) {
-              baseSet(result2, castPath(path, object), value);
+            var path2 = paths[index], value = baseGet(object, path2);
+            if (predicate(value, path2)) {
+              baseSet(result2, castPath(path2, object), value);
             }
           }
           return result2;
         }
-        function basePropertyDeep(path) {
+        function basePropertyDeep(path2) {
           return function(object) {
-            return baseGet(object, path);
+            return baseGet(object, path2);
           };
         }
         function basePullAll(array, values2, iteratee2, comparator) {
@@ -15217,14 +15217,14 @@ var require_lodash = __commonJS({
           var array = values(collection);
           return shuffleSelf(array, baseClamp(n, 0, array.length));
         }
-        function baseSet(object, path, value, customizer) {
+        function baseSet(object, path2, value, customizer) {
           if (!isObject(object)) {
             return object;
           }
-          path = castPath(path, object);
-          var index = -1, length = path.length, lastIndex = length - 1, nested = object;
+          path2 = castPath(path2, object);
+          var index = -1, length = path2.length, lastIndex = length - 1, nested = object;
           while (nested != null && ++index < length) {
-            var key = toKey(path[index]), newValue = value;
+            var key = toKey(path2[index]), newValue = value;
             if (key === "__proto__" || key === "constructor" || key === "prototype") {
               return object;
             }
@@ -15232,7 +15232,7 @@ var require_lodash = __commonJS({
               var objValue = nested[key];
               newValue = customizer ? customizer(objValue, key, nested) : undefined2;
               if (newValue === undefined2) {
-                newValue = isObject(objValue) ? objValue : isIndex(path[index + 1]) ? [] : {};
+                newValue = isObject(objValue) ? objValue : isIndex(path2[index + 1]) ? [] : {};
               }
             }
             assignValue(nested, key, newValue);
@@ -15398,13 +15398,13 @@ var require_lodash = __commonJS({
             }
           return result2;
         }
-        function baseUnset(object, path) {
-          path = castPath(path, object);
-          object = parent(object, path);
-          return object == null || delete object[toKey(last(path))];
+        function baseUnset(object, path2) {
+          path2 = castPath(path2, object);
+          object = parent(object, path2);
+          return object == null || delete object[toKey(last(path2))];
         }
-        function baseUpdate(object, path, updater, customizer) {
-          return baseSet(object, path, updater(baseGet(object, path)), customizer);
+        function baseUpdate(object, path2, updater, customizer) {
+          return baseSet(object, path2, updater(baseGet(object, path2)), customizer);
         }
         function baseWhile(array, predicate, isDrop, fromRight) {
           var length = array.length, index = fromRight ? length : -1;
@@ -16287,11 +16287,11 @@ var require_lodash = __commonJS({
           var match = source.match(reWrapDetails);
           return match ? match[1].split(reSplitDetails) : [];
         }
-        function hasPath(object, path, hasFunc) {
-          path = castPath(path, object);
-          var index = -1, length = path.length, result2 = false;
+        function hasPath(object, path2, hasFunc) {
+          path2 = castPath(path2, object);
+          var index = -1, length = path2.length, result2 = false;
           while (++index < length) {
-            var key = toKey(path[index]);
+            var key = toKey(path2[index]);
             if (!(result2 = object != null && hasFunc(object, key))) {
               break;
             }
@@ -16493,8 +16493,8 @@ var require_lodash = __commonJS({
             return apply(func, this, otherArgs);
           };
         }
-        function parent(object, path) {
-          return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
+        function parent(object, path2) {
+          return path2.length < 2 ? object : baseGet(object, baseSlice(path2, 0, -1));
         }
         function reorder(array, indexes) {
           var arrLength = array.length, length = nativeMin(indexes.length, arrLength), oldArray = copyArray(array);
@@ -17129,10 +17129,10 @@ var require_lodash = __commonJS({
           }
           return isString(collection) ? fromIndex <= length && collection.indexOf(value, fromIndex) > -1 : !!length && baseIndexOf(collection, value, fromIndex) > -1;
         }
-        var invokeMap = baseRest(function(collection, path, args) {
-          var index = -1, isFunc = typeof path == "function", result2 = isArrayLike(collection) ? Array2(collection.length) : [];
+        var invokeMap = baseRest(function(collection, path2, args) {
+          var index = -1, isFunc = typeof path2 == "function", result2 = isArrayLike(collection) ? Array2(collection.length) : [];
           baseEach(collection, function(value) {
-            result2[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
+            result2[++index] = isFunc ? apply(path2, value, args) : baseInvoke(value, path2, args);
           });
           return result2;
         });
@@ -17784,15 +17784,15 @@ var require_lodash = __commonJS({
         function functionsIn(object) {
           return object == null ? [] : baseFunctions(object, keysIn(object));
         }
-        function get(object, path, defaultValue) {
-          var result2 = object == null ? undefined2 : baseGet(object, path);
+        function get(object, path2, defaultValue) {
+          var result2 = object == null ? undefined2 : baseGet(object, path2);
           return result2 === undefined2 ? defaultValue : result2;
         }
-        function has(object, path) {
-          return object != null && hasPath(object, path, baseHas);
+        function has(object, path2) {
+          return object != null && hasPath(object, path2, baseHas);
         }
-        function hasIn(object, path) {
-          return object != null && hasPath(object, path, baseHasIn);
+        function hasIn(object, path2) {
+          return object != null && hasPath(object, path2, baseHasIn);
         }
         var invert = createInverter(function(result2, value, key) {
           if (value != null && typeof value.toString != "function") {
@@ -17845,10 +17845,10 @@ var require_lodash = __commonJS({
             return result2;
           }
           var isDeep = false;
-          paths = arrayMap(paths, function(path) {
-            path = castPath(path, object);
-            isDeep || (isDeep = path.length > 1);
-            return path;
+          paths = arrayMap(paths, function(path2) {
+            path2 = castPath(path2, object);
+            isDeep || (isDeep = path2.length > 1);
+            return path2;
           });
           copyObject(object, getAllKeysIn(object), result2);
           if (isDeep) {
@@ -17874,19 +17874,19 @@ var require_lodash = __commonJS({
             return [prop];
           });
           predicate = getIteratee(predicate);
-          return basePickBy(object, props, function(value, path) {
-            return predicate(value, path[0]);
+          return basePickBy(object, props, function(value, path2) {
+            return predicate(value, path2[0]);
           });
         }
-        function result(object, path, defaultValue) {
-          path = castPath(path, object);
-          var index = -1, length = path.length;
+        function result(object, path2, defaultValue) {
+          path2 = castPath(path2, object);
+          var index = -1, length = path2.length;
           if (!length) {
             length = 1;
             object = undefined2;
           }
           while (++index < length) {
-            var value = object == null ? undefined2 : object[toKey(path[index])];
+            var value = object == null ? undefined2 : object[toKey(path2[index])];
             if (value === undefined2) {
               index = length;
               value = defaultValue;
@@ -17895,12 +17895,12 @@ var require_lodash = __commonJS({
           }
           return object;
         }
-        function set(object, path, value) {
-          return object == null ? object : baseSet(object, path, value);
+        function set(object, path2, value) {
+          return object == null ? object : baseSet(object, path2, value);
         }
-        function setWith(object, path, value, customizer) {
+        function setWith(object, path2, value, customizer) {
           customizer = typeof customizer == "function" ? customizer : undefined2;
-          return object == null ? object : baseSet(object, path, value, customizer);
+          return object == null ? object : baseSet(object, path2, value, customizer);
         }
         var toPairs = createToPairs(keys);
         var toPairsIn = createToPairs(keysIn);
@@ -17922,15 +17922,15 @@ var require_lodash = __commonJS({
           });
           return accumulator;
         }
-        function unset(object, path) {
-          return object == null ? true : baseUnset(object, path);
+        function unset(object, path2) {
+          return object == null ? true : baseUnset(object, path2);
         }
-        function update(object, path, updater) {
-          return object == null ? object : baseUpdate(object, path, castFunction(updater));
+        function update(object, path2, updater) {
+          return object == null ? object : baseUpdate(object, path2, castFunction(updater));
         }
-        function updateWith(object, path, updater, customizer) {
+        function updateWith(object, path2, updater, customizer) {
           customizer = typeof customizer == "function" ? customizer : undefined2;
-          return object == null ? object : baseUpdate(object, path, castFunction(updater), customizer);
+          return object == null ? object : baseUpdate(object, path2, castFunction(updater), customizer);
         }
         function values(object) {
           return object == null ? [] : baseValues(object, keys(object));
@@ -18311,17 +18311,17 @@ var require_lodash = __commonJS({
         function matches(source) {
           return baseMatches(baseClone(source, CLONE_DEEP_FLAG));
         }
-        function matchesProperty(path, srcValue) {
-          return baseMatchesProperty(path, baseClone(srcValue, CLONE_DEEP_FLAG));
+        function matchesProperty(path2, srcValue) {
+          return baseMatchesProperty(path2, baseClone(srcValue, CLONE_DEEP_FLAG));
         }
-        var method = baseRest(function(path, args) {
+        var method = baseRest(function(path2, args) {
           return function(object) {
-            return baseInvoke(object, path, args);
+            return baseInvoke(object, path2, args);
           };
         });
         var methodOf = baseRest(function(object, args) {
-          return function(path) {
-            return baseInvoke(object, path, args);
+          return function(path2) {
+            return baseInvoke(object, path2, args);
           };
         });
         function mixin(object, source, options) {
@@ -18368,12 +18368,12 @@ var require_lodash = __commonJS({
         var over = createOver(arrayMap);
         var overEvery = createOver(arrayEvery);
         var overSome = createOver(arraySome);
-        function property(path) {
-          return isKey(path) ? baseProperty(toKey(path)) : basePropertyDeep(path);
+        function property(path2) {
+          return isKey(path2) ? baseProperty(toKey(path2)) : basePropertyDeep(path2);
         }
         function propertyOf(object) {
-          return function(path) {
-            return object == null ? undefined2 : baseGet(object, path);
+          return function(path2) {
+            return object == null ? undefined2 : baseGet(object, path2);
           };
         }
         var range = createRange();
@@ -18826,12 +18826,12 @@ var require_lodash = __commonJS({
         LazyWrapper.prototype.findLast = function(predicate) {
           return this.reverse().find(predicate);
         };
-        LazyWrapper.prototype.invokeMap = baseRest(function(path, args) {
-          if (typeof path == "function") {
+        LazyWrapper.prototype.invokeMap = baseRest(function(path2, args) {
+          if (typeof path2 == "function") {
             return new LazyWrapper(this);
           }
           return this.map(function(value) {
-            return baseInvoke(value, path, args);
+            return baseInvoke(value, path2, args);
           });
         });
         LazyWrapper.prototype.reject = function(predicate) {
@@ -19074,8 +19074,8 @@ var require_sign = __commonJS({
       } else if (isObjectPayload) {
         try {
           validatePayload(payload);
-        } catch (error2) {
-          return failure(error2);
+        } catch (error) {
+          return failure(error);
         }
         if (!options.mutatePayload) {
           payload = Object.assign({}, payload);
@@ -19096,14 +19096,14 @@ var require_sign = __commonJS({
       }
       try {
         validateOptions(options);
-      } catch (error2) {
-        return failure(error2);
+      } catch (error) {
+        return failure(error);
       }
       if (!options.allowInvalidAsymmetricKeyTypes) {
         try {
           validateAsymmetricKey(header.alg, secretOrPrivateKey);
-        } catch (error2) {
-          return failure(error2);
+        } catch (error) {
+          return failure(error);
         }
       }
       const timestamp = payload.iat || Math.floor(Date.now() / 1e3);
@@ -19258,11 +19258,11 @@ var require_dist_node19 = __commonJS({
           appId: appAuthentication.appId,
           expiresAt: new Date(appAuthentication.expiration * 1e3).toISOString()
         };
-      } catch (error2) {
+      } catch (error) {
         if (privateKey === "-----BEGIN RSA PRIVATE KEY-----") {
           throw new Error("The 'privateKey` option contains only the first line '-----BEGIN RSA PRIVATE KEY-----'. If you are setting it using a `.env` file, make sure it is set on a single line with newlines replaced by '\n'");
         } else {
-          throw error2;
+          throw error;
         }
       }
     }
@@ -19476,8 +19476,8 @@ var require_dist_node19 = __commonJS({
       return !!url && REGEX.test(url);
     }
     var FIVE_SECONDS_IN_MS = 5 * 1e3;
-    function isNotTimeSkewError(error2) {
-      return !(error2.message.match(/'Expiration time' claim \('exp'\) must be a numeric value representing the future time at which the assertion expires/) || error2.message.match(/'Issued at' claim \('iat'\) must be an Integer representing the time that the assertion was issued/));
+    function isNotTimeSkewError(error) {
+      return !(error.message.match(/'Expiration time' claim \('exp'\) must be a numeric value representing the future time at which the assertion expires/) || error.message.match(/'Issued at' claim \('iat'\) must be an Integer representing the time that the assertion was issued/));
     }
     async function hook(state, request2, route, parameters) {
       const endpoint = request2.endpoint.merge(route, parameters);
@@ -19493,15 +19493,15 @@ var require_dist_node19 = __commonJS({
         let response;
         try {
           response = await request2(endpoint);
-        } catch (error2) {
-          if (isNotTimeSkewError(error2)) {
-            throw error2;
+        } catch (error) {
+          if (isNotTimeSkewError(error)) {
+            throw error;
           }
-          if (typeof error2.response.headers.date === "undefined") {
-            throw error2;
+          if (typeof error.response.headers.date === "undefined") {
+            throw error;
           }
-          const diff = Math.floor((Date.parse(error2.response.headers.date) - Date.parse((/* @__PURE__ */ new Date()).toString())) / 1e3);
-          state.log.warn(error2.message);
+          const diff = Math.floor((Date.parse(error.response.headers.date) - Date.parse((/* @__PURE__ */ new Date()).toString())) / 1e3);
+          state.log.warn(error.message);
           state.log.warn(`[@octokit/auth-app] GitHub API time and system time are different by ${diff} seconds. Retrying request with the difference accounted for.`);
           const {
             token: token3
@@ -19537,15 +19537,15 @@ var require_dist_node19 = __commonJS({
       const timeSinceTokenCreationInMs = +/* @__PURE__ */ new Date() - +new Date(createdAt);
       try {
         return await request2(options);
-      } catch (error2) {
-        if (error2.status !== 401) {
-          throw error2;
+      } catch (error) {
+        if (error.status !== 401) {
+          throw error;
         }
         if (timeSinceTokenCreationInMs >= FIVE_SECONDS_IN_MS) {
           if (retries > 0) {
-            error2.message = `After ${retries} retries within ${timeSinceTokenCreationInMs / 1e3}s of creating the installation access token, the response remains 401. At this point, the cause may be an authentication problem or a system outage. Please check https://www.githubstatus.com for status information`;
+            error.message = `After ${retries} retries within ${timeSinceTokenCreationInMs / 1e3}s of creating the installation access token, the response remains 401. At this point, the cause may be an authentication problem or a system outage. Please check https://www.githubstatus.com for status information`;
           }
-          throw error2;
+          throw error;
         }
         ++retries;
         const awaitTime = retries * 1e3;
@@ -19615,45 +19615,45 @@ var require_dist_node20 = __commonJS({
         reason
       };
     }
-    function isRateLimitError(error2) {
-      if (error2.status !== 403) {
+    function isRateLimitError(error) {
+      if (error.status !== 403) {
         return false;
       }
-      if (!error2.response) {
+      if (!error.response) {
         return false;
       }
-      return error2.response.headers["x-ratelimit-remaining"] === "0";
+      return error.response.headers["x-ratelimit-remaining"] === "0";
     }
     var REGEX_ABUSE_LIMIT_MESSAGE = /\babuse\b/i;
-    function isAbuseLimitError(error2) {
-      if (error2.status !== 403) {
+    function isAbuseLimitError(error) {
+      if (error.status !== 403) {
         return false;
       }
-      return REGEX_ABUSE_LIMIT_MESSAGE.test(error2.message);
+      return REGEX_ABUSE_LIMIT_MESSAGE.test(error.message);
     }
     async function hook(reason, request, route, parameters) {
       const endpoint = request.endpoint.merge(route, parameters);
-      return request(endpoint).catch((error2) => {
-        if (error2.status === 404) {
-          error2.message = `Not found. May be due to lack of authentication. Reason: ${reason}`;
-          throw error2;
+      return request(endpoint).catch((error) => {
+        if (error.status === 404) {
+          error.message = `Not found. May be due to lack of authentication. Reason: ${reason}`;
+          throw error;
         }
-        if (isRateLimitError(error2)) {
-          error2.message = `API rate limit exceeded. This maybe caused by the lack of authentication. Reason: ${reason}`;
-          throw error2;
+        if (isRateLimitError(error)) {
+          error.message = `API rate limit exceeded. This maybe caused by the lack of authentication. Reason: ${reason}`;
+          throw error;
         }
-        if (isAbuseLimitError(error2)) {
-          error2.message = `You have triggered an abuse detection mechanism. This maybe caused by the lack of authentication. Reason: ${reason}`;
-          throw error2;
+        if (isAbuseLimitError(error)) {
+          error.message = `You have triggered an abuse detection mechanism. This maybe caused by the lack of authentication. Reason: ${reason}`;
+          throw error;
         }
-        if (error2.status === 401) {
-          error2.message = `Unauthorized. "${endpoint.method} ${endpoint.url}" failed most likely due to lack of authentication. Reason: ${reason}`;
-          throw error2;
+        if (error.status === 401) {
+          error.message = `Unauthorized. "${endpoint.method} ${endpoint.url}" failed most likely due to lack of authentication. Reason: ${reason}`;
+          throw error;
         }
-        if (error2.status >= 400 && error2.status < 500) {
-          error2.message = error2.message.replace(/\.?$/, `. May be caused by lack of authentication (${reason}).`);
+        if (error.status >= 400 && error.status < 500) {
+          error.message = error.message.replace(/\.?$/, `. May be caused by lack of authentication (${reason}).`);
         }
-        throw error2;
+        throw error;
       });
     }
     var createUnauthenticatedAuth = function createUnauthenticatedAuth2(options) {
@@ -20061,7 +20061,7 @@ var require_dist_node21 = __commonJS({
       try {
         const text = await request.text();
         json = text ? JSON.parse(text) : {};
-      } catch (error2) {
+      } catch (error) {
         return {
           status: 400,
           headers: {
@@ -20254,7 +20254,7 @@ var require_dist_node21 = __commonJS({
             "access-control-allow-origin": "*"
           }
         };
-      } catch (error2) {
+      } catch (error) {
         return {
           status: 400,
           headers: {
@@ -20262,7 +20262,7 @@ var require_dist_node21 = __commonJS({
             "access-control-allow-origin": "*"
           },
           text: JSON.stringify({
-            error: error2.message
+            error: error.message
           })
         };
       }
@@ -20554,17 +20554,17 @@ var require_aggregate_error = __commonJS({
         if (!Array.isArray(errors)) {
           throw new TypeError(`Expected input to be an Array, got ${typeof errors}`);
         }
-        errors = [...errors].map((error2) => {
-          if (error2 instanceof Error) {
-            return error2;
+        errors = [...errors].map((error) => {
+          if (error instanceof Error) {
+            return error;
           }
-          if (error2 !== null && typeof error2 === "object") {
-            return Object.assign(new Error(error2.message), error2);
+          if (error !== null && typeof error === "object") {
+            return Object.assign(new Error(error.message), error);
           }
-          return new Error(error2);
+          return new Error(error);
         });
-        let message = errors.map((error2) => {
-          return typeof error2.stack === "string" ? cleanInternalStack(cleanStack(error2.stack)) : String(error2);
+        let message = errors.map((error) => {
+          return typeof error.stack === "string" ? cleanInternalStack(cleanStack(error.stack)) : String(error);
         }).join("\n");
         message = "\n" + indentString(message, 4);
         super(message);
@@ -20572,8 +20572,8 @@ var require_aggregate_error = __commonJS({
         Object.defineProperty(this, "_errors", { value: errors });
       }
       *[Symbol.iterator]() {
-        for (const error2 of this._errors) {
-          yield error2;
+        for (const error of this._errors) {
+          yield error;
         }
       }
     };
@@ -20685,18 +20685,18 @@ var require_dist_node23 = __commonJS({
     function receiverOnError(state, handler) {
       handleEventHandlers(state, "error", handler);
     }
-    function wrapErrorHandler(handler, error2) {
+    function wrapErrorHandler(handler, error) {
       let returnValue;
       try {
-        returnValue = handler(error2);
-      } catch (error3) {
+        returnValue = handler(error);
+      } catch (error2) {
         console.log('FATAL: Error occurred in "error" event handler');
-        console.log(error3);
+        console.log(error2);
       }
       if (returnValue && returnValue.catch) {
-        returnValue.catch((error3) => {
+        returnValue.catch((error2) => {
           console.log('FATAL: Error occurred in "error" event handler');
-          console.log(error3);
+          console.log(error2);
         });
       }
     }
@@ -20710,12 +20710,12 @@ var require_dist_node23 = __commonJS({
     function receiverHandle(state, event) {
       const errorHandlers = state.hooks.error || [];
       if (event instanceof Error) {
-        const error2 = Object.assign(new AggregateError([event]), {
+        const error = Object.assign(new AggregateError([event]), {
           event,
           errors: [event]
         });
-        errorHandlers.forEach((handler) => wrapErrorHandler(handler, error2));
-        return Promise.reject(error2);
+        errorHandlers.forEach((handler) => wrapErrorHandler(handler, error));
+        return Promise.reject(error);
       }
       if (!event || !event.name) {
         throw new AggregateError(["Event name not passed"]);
@@ -20735,7 +20735,7 @@ var require_dist_node23 = __commonJS({
         }
         return promise.then((event2) => {
           return handler(event2);
-        }).catch((error2) => errors.push(Object.assign(error2, {
+        }).catch((error) => errors.push(Object.assign(error, {
           event
         })));
       });
@@ -20743,13 +20743,13 @@ var require_dist_node23 = __commonJS({
         if (errors.length === 0) {
           return;
         }
-        const error2 = new AggregateError(errors);
-        Object.assign(error2, {
+        const error = new AggregateError(errors);
+        Object.assign(error, {
           event,
           errors
         });
-        errorHandlers.forEach((handler) => wrapErrorHandler(handler, error2));
-        throw error2;
+        errorHandlers.forEach((handler) => wrapErrorHandler(handler, error));
+        throw error;
       });
     }
     function removeListener(state, webhookNameOrNames, handler) {
@@ -20798,8 +20798,8 @@ var require_dist_node23 = __commonJS({
     async function verifyAndReceive(state, event) {
       const matchesSignature = await webhooksMethods.verify(state.secret, typeof event.payload === "object" ? toNormalizedJsonString(event.payload) : event.payload, event.signature);
       if (!matchesSignature) {
-        const error2 = new Error("[@octokit/webhooks] signature does not match event payload and secret");
-        return state.eventHandler.receive(Object.assign(error2, {
+        const error = new Error("[@octokit/webhooks] signature does not match event payload and secret");
+        return state.eventHandler.receive(Object.assign(error, {
           event,
           status: 400
         }));
@@ -20824,16 +20824,16 @@ var require_dist_node23 = __commonJS({
       return new Promise((resolve, reject) => {
         let data = "";
         request.setEncoding("utf8");
-        request.on("error", (error2) => reject(new AggregateError([error2])));
+        request.on("error", (error) => reject(new AggregateError([error])));
         request.on("data", (chunk) => data += chunk);
         request.on("end", () => {
           try {
             JSON.parse(data);
             resolve(data);
-          } catch (error2) {
-            error2.message = "Invalid JSON";
-            error2.status = 400;
-            reject(new AggregateError([error2]));
+          } catch (error) {
+            error.message = "Invalid JSON";
+            error.status = 400;
+            reject(new AggregateError([error]));
           }
         });
       });
@@ -20842,7 +20842,7 @@ var require_dist_node23 = __commonJS({
       let pathname;
       try {
         pathname = new URL(request.url, "http://localhost").pathname;
-      } catch (error2) {
+      } catch (error) {
         response.writeHead(422, {
           "content-type": "application/json"
         });
@@ -20902,14 +20902,14 @@ var require_dist_node23 = __commonJS({
         if (didTimeout)
           return;
         response.end("ok\n");
-      } catch (error2) {
+      } catch (error) {
         clearTimeout(timeout);
         if (didTimeout)
           return;
-        const err = Array.from(error2)[0];
+        const err = Array.from(error)[0];
         const errorMessage = err.message ? `${err.name}: ${err.message}` : "Error: An Unspecified error occurred";
         response.statusCode = typeof err.status !== "undefined" ? err.status : 500;
-        options.log.error(error2);
+        options.log.error(error);
         response.end(JSON.stringify({
           error: errorMessage
         }));
@@ -20924,7 +20924,7 @@ var require_dist_node23 = __commonJS({
       }));
     }
     function createNodeMiddleware(webhooks, {
-      path = "/api/github/webhooks",
+      path: path2 = "/api/github/webhooks",
       onUnhandledRequest = onUnhandledRequestDefault,
       log = createLogger()
     } = {}) {
@@ -20933,7 +20933,7 @@ var require_dist_node23 = __commonJS({
         return onUnhandledRequest(request, response);
       };
       return middleware.bind(null, webhooks, {
-        path,
+        path: path2,
         onUnhandledRequest: deprecateOnUnhandledRequest,
         log
       });
@@ -21374,7 +21374,7 @@ var require_package = __commonJS({
 var require_main = __commonJS({
   "node_modules/dotenv/lib/main.js"(exports, module2) {
     var fs2 = require("fs");
-    var path = require("path");
+    var path2 = require("path");
     var os = require("os");
     var packageJson = require_package();
     var version2 = packageJson.version;
@@ -21402,10 +21402,10 @@ var require_main = __commonJS({
       console.log(`[dotenv@${version2}][DEBUG] ${message}`);
     }
     function _resolveHome(envPath) {
-      return envPath[0] === "~" ? path.join(os.homedir(), envPath.slice(1)) : envPath;
+      return envPath[0] === "~" ? path2.join(os.homedir(), envPath.slice(1)) : envPath;
     }
     function config(options) {
-      let dotenvPath = path.resolve(process.cwd(), ".env");
+      let dotenvPath = path2.resolve(process.cwd(), ".env");
       let encoding = "utf8";
       const debug2 = Boolean(options && options.debug);
       const override = Boolean(options && options.override);
@@ -21478,6 +21478,7 @@ function groupRunnersByLabel(runnersJson) {
 
 // src/main.ts
 var import_fs = __toESM(require("fs"));
+var import_path = __toESM(require("path"));
 import_dotenv.default.config();
 function run() {
   return __async(this, null, function* () {
@@ -21512,10 +21513,10 @@ function run() {
           core.debug("Found this data: " + JSON.stringify(data));
         }
         runnerInfo = data;
-      } catch (error2) {
-        console.log(error2);
+      } catch (error) {
+        console.log(error);
         core.setFailed(
-          `Could not authenticate with access token. Please check that it is correct and that it has the correct scope (see readme) to the organization: ${error2}`
+          `Could not authenticate with access token. Please check that it is correct and that it has the correct scope (see readme) to the organization: ${error}`
         );
         return;
       }
@@ -21530,10 +21531,10 @@ function run() {
         console.log(`Found ${data.length} runners at the repo level`);
         core.debug("Found this data: " + JSON.stringify(data));
         runnerInfo = data;
-      } catch (error2) {
-        console.log(error2);
+      } catch (error) {
+        console.log(error);
         core.setFailed(
-          `Could not authenticate with access token. Please check that it is correct and that it has the correct scope (see readme) on the repository: ${error2}`
+          `Could not authenticate with access token. Please check that it is correct and that it has the correct scope (see readme) on the repository: ${error}`
         );
         return;
       }
@@ -21546,21 +21547,19 @@ function run() {
       console.log(`Found ${runnerInfo.length} runners`);
       const json = JSON.stringify(runnerInfo);
       core.setOutput("runners", json);
-      const fileName = "runners.json";
+      const fileName = import_path.default.resolve("runners.json");
       writeJsonToFile(json, fileName);
       core.setOutput("runners-file-location", fileName);
       const grouped = groupRunnersByLabel(runnerInfo);
       console.log(`Found ${grouped.length} groups`);
       const jsonGrouped = JSON.stringify(grouped);
       core.setOutput("grouped", jsonGrouped);
-      const groupedFileName = "runners-grouped.json";
+      const groupedFileName = import_path.default.resolve("runners-grouped.json");
       writeJsonToFile(jsonGrouped, groupedFileName);
       core.setOutput("grouped-file-location", groupedFileName);
     }
     function writeJsonToFile(json, fileName) {
-      import_fs.default.writeFile(fileName, json, function(err) {
-        core.error(`Error writing to file [${fileName}]:` + err);
-      });
+      import_fs.default.writeFileSync(fileName, json);
     }
   });
 }
