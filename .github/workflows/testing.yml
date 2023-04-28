@@ -84,3 +84,17 @@ jobs:
               core.error('Too many runners with label "self-hosted" found')
               return
             }
+
+      - name: Test if result files are not empty
+        run: |
+          runnersFile=${{ steps.load-runner-info-org.outputs.runner-file-location }}
+          if [ ! -s $runnersFile ]; then
+            echo "File [$runnersFile] is empty"
+            exit 1
+          fi
+
+          groupedFile=${{ steps.load-runner-info-org.outputs.grouped-file-location }}
+          if [ ! -s $groupedFile ]; then
+            echo "File [$groupedFile] is empty"
+            exit 1
+          fi

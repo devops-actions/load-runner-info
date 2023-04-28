@@ -20,6 +20,10 @@ outputs:
     description: 'JSON string with the runner information available in the organization or repo'
   grouped:
     description: 'JSON string with the labels and the number of runners with that label'
+  runners-file-location:
+    description: 'Path to the file that holds the JSON output'
+  grouped-file-location:
+    description: 'Path to the file that holds the JSON output'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/main.js'
