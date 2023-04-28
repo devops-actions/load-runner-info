@@ -34,6 +34,12 @@ To run this action at the **repository** level, the access token must have scope
 |`runners`|string|A JSON string with the runner information available|
 |`grouped`|string|A JSON string with the number of runner grouped by their labels, also indicating their status|
 
+When there are so many runners the JSON gets to large to use, use the filebased outputs instead:
+|Name|Type|Description|
+|---|---|---|
+|`runner-file-location`|string|The path to the file with the runner information available|
+|`grouped-file-location`|string|The path to the file with the number of runners grouped by their labels, also indicating their status|
+
 Runners output example:
 ``` json
 {
