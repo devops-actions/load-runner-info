@@ -10,7 +10,7 @@ Basic usage:
       - uses: devops-actions/load-runner-info@v1.0.6
         id: load-runner-info-org
         with: 
-          accessToken: ${{ secrets.PAT }}
+          accessToken: ${{ secrets.access_token }}
           organization: ${{ env.organization }}
 ```
 Read the complete example for using the outputs as well.
@@ -92,28 +92,32 @@ jobs:
   test-from-organization:
     runs-on: ubuntu-latest
     steps:
+      - name: Get access token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v2.1.0
+        with:
+          application_id: ${{ secrets.APPLICATION_ID }}
+          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+          
       - uses: devops-actions/load-runner-info@v1.0.6
         id: load-runner-info-org
         with: 
-          accessToken: ${{ secrets.PAT }}
+          accessToken: ${{ steps.get_workflow_token.outputs.token }}
           organization: ${{ env.organization }}
 
-      - name: Store output in result files
-        run: |
-          echo '${{ steps.load-runner-info-org.outputs.runners }}' > 'runners-organization.json'
-          echo '${{ steps.load-runner-info-org.outputs.grouped }}' > 'runners-grouped-organization.json'
-            
       - name: Upload result file as artefact for inspection
         uses: actions/upload-artifact@v2
         with: 
           name: runners-organization-${{ env.organization }}
-          path: 'runners-**.json'
+          path: 
+            - ${{ steps.load-runner-info-org.outputs.runners-file-location }}
+            - ${{ steps.load-runner-info-org.outputs.grouped-file-location }}
 
       - uses: actions/github-script@v5
         name: Test runner info
         with: 
           script: |
-            const info = JSON.parse(`${{ steps.load-runner-info-org.outputs.runners }}`)
+            const info = JSON.parse(`${{ steps.load-runner-info-org.outputs.runners-file-location }}`)
             if (info.length == 0) {
               core.error('No runners found')            
               return
@@ -127,7 +131,7 @@ jobs:
 
             console.log(``)
 
-            const grouped = JSON.parse(`${{ steps.load-runner-info-org.outputs.grouped }}`)
+            const grouped = JSON.parse(`${{ steps.load-runner-info-org.outputs.grouped-file-location }}`)
             console.log(`Found ${grouped.length} runner label(s)`)
             for (let num = 0; num < grouped.length; num++) {
               const group = grouped[num]
