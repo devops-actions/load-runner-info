@@ -7,9 +7,8 @@ jobs:
   semver:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        # Check out with fetch-depth: 0 to analyze
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # needed to get all tags
       
-      - uses: jessehouwing/actions-semver-checker@v1
+      - uses: jessehouwing/actions-semver-checker@c754e60c1f2838fefc4d4b34829e0317478b8006 # v1
