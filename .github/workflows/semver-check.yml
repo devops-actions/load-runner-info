@@ -1,0 +1,13 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  semver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        # Check out with fetch-depth: 0 to analyze
+        with:
+          fetch-depth: 0
+      
+      - uses: jessehouwing/actions-semver-checker@v1
