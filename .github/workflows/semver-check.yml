@@ -1,7 +1,9 @@
 name: Repo SemVer check
 on:
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
-  push:  
 
 jobs:
   semver:
