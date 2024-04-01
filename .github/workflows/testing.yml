@@ -22,14 +22,14 @@ jobs:
     runs-on: ubuntu-latest
     #if: github.ref == 'refs/heads/main' # don't run on PRs
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v2.5.0
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v2.5.0
       - run: npm ci
       - run: npm run all
 
   test-from-organization:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v2.5.0
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v2.5.0
       - uses: ./
         id: load-runner-info-org
         with: 
