@@ -25,5 +25,5 @@ outputs:
   grouped-file-location:
     description: 'Path to the file that holds the JSON output'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/main.js'
