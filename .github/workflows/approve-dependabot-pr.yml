@@ -12,5 +12,5 @@ jobs:
       pull-requests: write
       actions: write
     uses: devops-actions/.github/.github/workflows/approve-dependabot-pr.yml@main
-    #secrets:
-    #  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
