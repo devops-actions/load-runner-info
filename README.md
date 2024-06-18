@@ -7,7 +7,7 @@ Can be used to verify the amount of runners for a label is as expected.
 # Example
 Basic usage:
 ``` yaml
-      - uses: devops-actions/load-runner-info@v1.0.6
+      - uses: devops-actions/load-runner-info@7f8c07227aa6176e94e4eeb912016bb0a9d33796 #v1.0.10
         id: load-runner-info-org
         with: 
           accessToken: ${{ secrets.access_token }}
@@ -94,26 +94,26 @@ jobs:
     steps:
       - name: Get access token
         id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@v2.1.0
+        uses: peter-murray/workflow-application-token-action@dc0413987a085fa17d19df9e47d4677cf81ffef3 #3.3.0
         with:
           application_id: ${{ secrets.APPLICATION_ID }}
           application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
           
-      - uses: devops-actions/load-runner-info@v1.0.6
+      - uses: devops-actions/load-runner-info@7f8c07227aa6176e94e4eeb912016bb0a9d33796 #v1.0.10
         id: load-runner-info-org
         with: 
           accessToken: ${{ steps.get_workflow_token.outputs.token }}
           organization: ${{ env.organization }}
 
       - name: Upload result file as artefact for inspection
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with: 
           name: runners-organization-${{ env.organization }}
           path: 
             - ${{ steps.load-runner-info-org.outputs.runners-file-location }}
             - ${{ steps.load-runner-info-org.outputs.grouped-file-location }}
 
-      - uses: actions/github-script@v5
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
         name: Test runner info
         with: 
           script: |
