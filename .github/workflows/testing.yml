@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     #if: github.ref == 'refs/heads/main' # don't run on PRs
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v2.5.0
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v2.5.0
       - run: npm ci
       - run: npm run all
 
@@ -36,7 +36,7 @@ jobs:
           application_id: ${{ vars.DEVOPS_ACTIONS_APPLICATION_ID }}
           application_private_key: ${{ secrets.DEVOPS_ACTIONS_APPLICATION_KEY }}
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v2.5.0
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v2.5.0
       - uses: ./
         id: load-runner-info-org
         with: 
