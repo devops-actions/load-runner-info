@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Get GitHub Application Token
         id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@dc0413987a085fa17d19df9e47d4677cf81ffef3 # v3
+        uses: peter-murray/workflow-application-token-action@8e4e6fbf6fcc8a272781d97597969d21b3812974 # v3
         with:
           application_id: ${{ vars.DEVOPS_ACTIONS_APPLICATION_ID }}
           application_private_key: ${{ secrets.DEVOPS_ACTIONS_APPLICATION_KEY }}
