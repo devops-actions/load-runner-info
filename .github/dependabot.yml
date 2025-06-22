@@ -1,21 +1,46 @@
 version: 2
 updates:
-  # disabled to cut down on the noise updates give (and then require to push new versions
-  # I decided to roll back on these updates and only do them when a dependency has a vulnerability issue
-  
-  # Enable version updates for npm
-  - package-ecosystem: 'npm-disabled'
+  # Enable version updates for npm with grouping to reduce PR noise
+  - package-ecosystem: 'npm'
     # Look for `package.json` and `lock` files in the `root` directory
     directory: '/'
-    # Check the npm registry for updates every week
+    # Check the npm registry for updates every month
     schedule:
       interval: 'monthly'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
+    groups:
+      # Group all production dependencies together
+      production-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@types/*"
+          - "*eslint*"
+          - "jest"
+          - "ts-jest"
+          - "typescript"
+          - "prettier"
+          - "esbuild"
+      # Group all development dependencies together  
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "*eslint*"
+          - "jest"
+          - "ts-jest"
+          - "typescript"
+          - "prettier"
+          - "esbuild"
     
-  # Enable version updates for actions
-  - package-ecosystem: 'github-actions-disabled'
+  # Enable version updates for actions with grouping
+  - package-ecosystem: 'github-actions'
     directory: '.github/workflows/'
-    # Check the npm registry for updates every week
+    # Check for action updates every month
     schedule:
       interval: 'monthly'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
+    groups:
+      # Group all GitHub Actions updates together
+      github-actions:
+        patterns:
+          - "*"
