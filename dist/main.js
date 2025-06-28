@@ -5266,7 +5266,7 @@ var require_body = __commonJS({
     var ReadableStream = globalThis.ReadableStream;
     var File = NativeFile ?? UndiciFile;
     var textEncoder = new TextEncoder();
-    var textDecoder = new TextDecoder();
+    var textDecoder2 = new TextDecoder();
     function extractBody(object, keepalive = false) {
       if (!ReadableStream) {
         ReadableStream = require("stream/web").ReadableStream;
@@ -5586,7 +5586,7 @@ Content-Type: ${value.type || "application/octet-stream"}\r
       if (buffer[0] === 239 && buffer[1] === 187 && buffer[2] === 191) {
         buffer = buffer.subarray(3);
       }
-      const output = textDecoder.decode(buffer);
+      const output = textDecoder2.decode(buffer);
       return output;
     }
     function parseJSONFromBytes(bytes) {
@@ -14468,7 +14468,7 @@ var require_util4 = __commonJS({
           if (encoding === "failure") {
             encoding = "UTF-8";
           }
-          return decode(bytes, encoding);
+          return decode2(bytes, encoding);
         }
         case "ArrayBuffer": {
           const sequence = combineByteSequences(bytes);
@@ -14485,7 +14485,7 @@ var require_util4 = __commonJS({
         }
       }
     }
-    function decode(ioQueue, encoding) {
+    function decode2(ioQueue, encoding) {
       const bytes = combineByteSequences(ioQueue);
       const BOMEncoding = BOMSniffing(bytes);
       let slice = 0;
@@ -21215,7 +21215,7 @@ var require_package = __commonJS({
   "node_modules/dotenv/package.json"(exports2, module2) {
     module2.exports = {
       name: "dotenv",
-      version: "16.5.0",
+      version: "17.0.0",
       description: "Loads environment variables from .env file",
       main: "lib/main.js",
       types: "lib/main.d.ts",
@@ -21238,7 +21238,7 @@ var require_package = __commonJS({
         lint: "standard",
         pretest: "npm run lint && npm run dts-check",
         test: "tap run --allow-empty-coverage --disable-coverage --timeout=60000",
-        "test:coverage": "tap run --show-full-coverage --timeout=60000 --coverage-report=lcov",
+        "test:coverage": "tap run --show-full-coverage --timeout=60000 --coverage-report=text --coverage-report=lcov",
         prerelease: "npm test",
         release: "standard-version"
       },
@@ -21308,8 +21308,10 @@ var require_main2 = __commonJS({
       return obj;
     }
     function _parseVault(options) {
+      options = options || {};
       const vaultPath = _vaultPath(options);
-      const result = DotenvModule.configDotenv({ path: vaultPath });
+      options.path = vaultPath;
+      const result = DotenvModule.configDotenv(options);
       if (!result.parsed) {
         const err = new Error(`MISSING_DATA: Cannot parse ${vaultPath} for an unknown reason`);
         err.code = "MISSING_DATA";
@@ -21333,10 +21335,13 @@ var require_main2 = __commonJS({
       return DotenvModule.parse(decrypted);
     }
     function _warn(message) {
-      console.log(`[dotenv@${version}][WARN] ${message}`);
+      console.error(`[dotenv@${version}][WARN] ${message}`);
     }
     function _debug(message) {
       console.log(`[dotenv@${version}][DEBUG] ${message}`);
+    }
+    function _log(message) {
+      console.log(`[dotenv@${version}] ${message}`);
     }
     function _dotenvKey(options) {
       if (options && options.DOTENV_KEY && options.DOTENV_KEY.length > 0) {
@@ -21405,8 +21410,9 @@ var require_main2 = __commonJS({
     }
     function _configVault(options) {
       const debug2 = Boolean(options && options.debug);
-      if (debug2) {
-        _debug("Loading env from encrypted .env.vault");
+      const quiet = Boolean(options && options.quiet);
+      if (debug2 || !quiet) {
+        _log("Loading env from encrypted .env.vault");
       }
       const parsed = DotenvModule._parseVault(options);
       let processEnv = process.env;
@@ -21420,6 +21426,7 @@ var require_main2 = __commonJS({
       const dotenvPath = path2.resolve(process.cwd(), ".env");
       let encoding = "utf8";
       const debug2 = Boolean(options && options.debug);
+      const quiet = Boolean(options && options.quiet);
       if (options && options.encoding) {
         encoding = options.encoding;
       } else {
@@ -21456,6 +21463,22 @@ var require_main2 = __commonJS({
         processEnv = options.processEnv;
       }
       DotenvModule.populate(processEnv, parsedAll, options);
+      if (debug2 || !quiet) {
+        const keysCount = Object.keys(parsedAll).length;
+        const shortPaths = [];
+        for (const filePath of optionPaths) {
+          try {
+            const relative = path2.relative(process.cwd(), filePath);
+            shortPaths.push(relative);
+          } catch (e) {
+            if (debug2) {
+              _debug(`Failed to load ${filePath} ${e.message}`);
+            }
+            lastError = e;
+          }
+        }
+        _log(`injecting env (${keysCount}) from ${shortPaths.join(",")} \u2013 \u{1F510} encrypt with dotenvx: https://dotenvx.com`);
+      }
       if (lastError) {
         return { parsed: parsedAll, error: lastError };
       } else {
@@ -22021,7 +22044,7 @@ var RequestError = class extends Error {
 };
 
 // node_modules/@octokit/request/dist-bundle/index.js
-var VERSION2 = "0.0.0-development";
+var VERSION2 = "10.0.3";
 var defaults_default = {
   headers: {
     "user-agent": `octokit-request.js/${VERSION2} ${getUserAgent()}`
@@ -22347,7 +22370,7 @@ var createTokenAuth = function createTokenAuth2(token) {
 };
 
 // node_modules/@octokit/core/dist-src/version.js
-var VERSION4 = "6.1.5";
+var VERSION4 = "7.0.2";
 
 // node_modules/@octokit/core/dist-src/index.js
 var noop = () => {
@@ -22485,14 +22508,16 @@ function normalizePaginatedListResponse(response) {
       data: []
     };
   }
-  const responseNeedsNormalization = "total_count" in response.data && !("url" in response.data);
+  const responseNeedsNormalization = ("total_count" in response.data || "total_commits" in response.data) && !("url" in response.data);
   if (!responseNeedsNormalization) return response;
   const incompleteResults = response.data.incomplete_results;
   const repositorySelection = response.data.repository_selection;
   const totalCount = response.data.total_count;
+  const totalCommits = response.data.total_commits;
   delete response.data.incomplete_results;
   delete response.data.repository_selection;
   delete response.data.total_count;
+  delete response.data.total_commits;
   const namespaceKey = Object.keys(response.data)[0];
   const data = response.data[namespaceKey];
   response.data = data;
@@ -22503,6 +22528,7 @@ function normalizePaginatedListResponse(response) {
     response.data.repository_selection = repositorySelection;
   }
   response.data.total_count = totalCount;
+  response.data.total_commits = totalCommits;
   return response;
 }
 function iterator(octokit, route, parameters) {
@@ -22521,6 +22547,16 @@ function iterator(octokit, route, parameters) {
           url = ((normalizedResponse.headers.link || "").match(
             /<([^<>]+)>;\s*rel="next"/
           ) || [])[1];
+          if (!url && "total_commits" in normalizedResponse.data) {
+            const parsedUrl = new URL(normalizedResponse.url);
+            const params = parsedUrl.searchParams;
+            const page = parseInt(params.get("page") || "1", 10);
+            const per_page = parseInt(params.get("per_page") || "250", 10);
+            if (page * per_page < normalizedResponse.data.total_commits) {
+              params.set("page", String(page + 1));
+              url = parsedUrl.toString();
+            }
+          }
           return { value: normalizedResponse };
         } catch (error) {
           if (error.status !== 409) throw error;
@@ -22741,7 +22777,7 @@ function paginateGraphQL(octokit) {
 }
 
 // node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/version.js
-var VERSION6 = "14.0.0";
+var VERSION6 = "16.0.0";
 
 // node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/generated/endpoints.js
 var Endpoints = {
@@ -23215,6 +23251,9 @@ var Endpoints = {
     getGithubBillingUsageReportOrg: [
       "GET /organizations/{org}/settings/billing/usage"
     ],
+    getGithubBillingUsageReportUser: [
+      "GET /users/{username}/settings/billing/usage"
+    ],
     getGithubPackagesBillingOrg: ["GET /orgs/{org}/settings/billing/packages"],
     getGithubPackagesBillingUser: [
       "GET /users/{username}/settings/billing/packages"
@@ -23513,6 +23552,7 @@ var Endpoints = {
     ],
     listCopilotSeats: ["GET /orgs/{org}/copilot/billing/seats"]
   },
+  credentials: { revoke: ["POST /credentials/revoke"] },
   dependabot: {
     addSelectedRepoToOrgSecret: [
       "PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"
@@ -25301,10 +25341,8 @@ function urlBuilderAuthorize(base, options) {
   };
   let url = base;
   Object.keys(map).filter((k) => options[k] !== null).filter((k) => {
-    if (k !== "scopes")
-      return true;
-    if (options.clientType === "github-app")
-      return false;
+    if (k !== "scopes") return true;
+    if (options.clientType === "github-app") return false;
     return !Array.isArray(options[k]) || options[k].length > 0;
   }).map((key) => [map[key], `${options[key]}`]).forEach(([key, value], index) => {
     url += index === 0 ? `?` : "&";
@@ -26611,7 +26649,7 @@ async function sendRequestWithRetries(state, request2, options, createdAt, retri
     return sendRequestWithRetries(state, request2, options, createdAt, retries);
   }
 }
-var VERSION12 = "7.2.1";
+var VERSION12 = "8.0.1";
 function createAppAuth(options) {
   if (!options.appId) {
     throw new Error("[@octokit/auth-app] appId option is required");
@@ -26723,7 +26761,7 @@ var createUnauthenticatedAuth = function createUnauthenticatedAuth2(options) {
 };
 
 // node_modules/@octokit/oauth-app/dist-node/index.js
-var VERSION13 = "7.1.6";
+var VERSION13 = "8.0.1";
 function addEventHandler(state, eventName, eventHandler) {
   if (Array.isArray(eventName)) {
     for (const singleEventName of eventName) {
@@ -27115,7 +27153,7 @@ var OAuthApp = class {
 var import_node_crypto3 = require("node:crypto");
 var import_node_crypto4 = require("node:crypto");
 var import_node_buffer = require("node:buffer");
-var VERSION14 = "5.1.1";
+var VERSION14 = "6.0.0";
 async function sign(secret, payload) {
   if (!secret || !payload) {
     throw new TypeError(
@@ -27657,6 +27695,8 @@ async function verifyAndReceive(state, event) {
     payload
   });
 }
+var textDecoder = new TextDecoder("utf-8", { fatal: false });
+var decode = textDecoder.decode.bind(textDecoder);
 var Webhooks = class {
   sign;
   verify;
@@ -27689,7 +27729,7 @@ var Webhooks = class {
 };
 
 // node_modules/@octokit/app/dist-node/index.js
-var VERSION15 = "15.1.6";
+var VERSION15 = "16.0.1";
 function webhooks(appOctokit, options) {
   return new Webhooks({
     secret: options.secret,
