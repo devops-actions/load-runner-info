@@ -4,6 +4,10 @@ Can be used to verify the amount of runners for a label is as expected.
 
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info/badge)](https://api.securityscorecards.dev/projects/github.com/devops-actions/load-runner-info)
 
+## Security
+
+All releases include a Software Bill of Materials (SBOM) in SPDX format (`sbom.spdx.json`) that provides detailed information about the dependencies used in this action. The SBOM is generated from GitHub's dependency graph and included as a release asset.
+
 # Example
 Basic usage:
 ``` yaml
