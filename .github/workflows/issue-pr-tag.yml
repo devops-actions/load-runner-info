@@ -7,6 +7,9 @@ on:
     types: [opened, edited]
   pull_request:
     types: [opened, edited]
+  push:
+    paths:
+      - .github/workflows/issue-pr-tag.yml
 
 permissions:
   contents: read
@@ -16,8 +19,6 @@ jobs:
     uses: devops-actions/.github/.github/workflows/issue-pr-tag.yml@main
     permissions:
       contents: read
-      issues: write
-      pull-requests: write
     with:
       org_name: ${{ vars.FIXED_ORG_NAME }}
       tag_team: ${{ vars.TAG_TEAM }}
