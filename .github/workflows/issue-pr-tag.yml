@@ -8,6 +8,9 @@ on:
   pull_request:
     types: [opened, edited]
 
+permissions:
+  contents: read
+
 jobs:
   notify:
     uses: devops-actions/.github/.github/workflows/issue-pr-tag.yml@main
