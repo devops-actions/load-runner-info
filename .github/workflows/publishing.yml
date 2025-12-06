@@ -10,7 +10,8 @@ env:
   repo: load-runner-info
 
 # Declare default GITHUB_TOKEN permissions as read only.
-permissions: read-all
+permissions:
+  contents: read
    
 jobs:
   test-from-organization:
