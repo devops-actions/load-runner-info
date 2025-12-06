@@ -1,0 +1,15 @@
+name: Submit Actions Dependencies
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1' # Weekly
+jobs:
+  submit-dependencies:
+    uses: devops-actions/.github/.github/workflows/actions-dependencies.yml@main
+    permissions:
+      contents: write # Required to read workflow files
+      id-token: write # Required for dependency submission
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
