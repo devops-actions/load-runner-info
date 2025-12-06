@@ -1,3 +1,5 @@
+name: Submit Actions Dependencies
+on:
   push:
     branches: [main]
   workflow_dispatch:
