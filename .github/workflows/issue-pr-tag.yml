@@ -7,9 +7,6 @@ on:
     types: [opened, edited]
   pull_request:
     types: [opened, edited]
-  push:
-    paths:
-      - .github/workflows/issue-pr-tag.yml
 
 permissions:
   contents: read
