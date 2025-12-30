@@ -1,0 +1,21 @@
+name: Check for New Release
+
+on:
+  # Run weekly on Monday mornings
+  schedule:
+    - cron: '0 9 * * 1'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-release:
+    name: Check if release is needed
+    uses: devops-actions/.github/.github/workflows/time-for-new-release.yml@main
+    # Workflow automatically detects:
+    #   1. Code changes to the action (not just docs/tests)
+    #   2. Security-related dependency updates
