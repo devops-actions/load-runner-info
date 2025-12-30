@@ -15,14 +15,15 @@ env:
   repo: load-runner-info
 
 # Declare default GITHUB_TOKEN permissions as read only.
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
     #if: github.ref == 'refs/heads/main' # don't run on PRs
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v2.5.0
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v2.5.0
       - run: npm ci
       - run: npm run all
 
@@ -36,7 +37,7 @@ jobs:
           application_id: ${{ vars.DEVOPS_ACTIONS_APPLICATION_ID }}
           application_private_key: ${{ secrets.DEVOPS_ACTIONS_APPLICATION_KEY }}
 
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v2.5.0
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v2.5.0
       - uses: ./
         id: load-runner-info-org
         with: 
@@ -49,12 +50,12 @@ jobs:
           echo '${{ steps.load-runner-info-org.outputs.grouped }}' > 'runners-grouped-organization.json'
             
       - name: Upload result file as artefact for inspection
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with: 
           name: runners-organization-${{ env.organization }}
           path: 'runners-**.json'
 
-      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         name: Test runner info
         with: 
           script: |
