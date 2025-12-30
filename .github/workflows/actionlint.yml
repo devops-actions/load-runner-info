@@ -3,12 +3,11 @@ on: [push, pull_request]
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   actionlint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      
-      - name: Check workflow files for linting errors
-        uses: devops-actions/actionlint@c6744a34774e4e1c1df0ff66bdb07ec7ee480ca0 #v0.1.9
+    uses: devops-actions/.github/.github/workflows/actionlint.yml@main
+    permissions:
+      contents: read
+      pull-requests: write
