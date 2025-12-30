@@ -107,14 +107,40 @@ jobs:
           application_id: ${{ vars.DEVOPS_ACTIONS_APPLICATION_ID }}
           application_private_key: ${{ secrets.DEVOPS_ACTIONS_APPLICATION_KEY }}
 
+      # generate SBOM for the release
+      - name: Generate SBOM
+        env:
+          GH_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+        run: |
+          echo "Generating SBOM for ${{ github.repository }}"
+          gh api repos/${{ github.repository }}/dependency-graph/sbom \
+            --jq '.sbom' \
+            > sbom.spdx.json
+          
+          # Verify SBOM was generated
+          if [ ! -f sbom.spdx.json ] || [ ! -s sbom.spdx.json ]; then
+            echo "Failed to generate SBOM"
+            exit 1
+          fi
+          
+          echo "SBOM generated successfully"
+          echo "SBOM size: $(wc -c < sbom.spdx.json) bytes"
+
       # publish a release with the build assets
       - uses: rajbos-actions/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         id: publish
         with:
           name: Release ${{ steps.tag.outputs.tag }}
           tag_name: ${{ github.ref }}
-          body: Release ${{ steps.tag.outputs.tag }} is available now
-          files: ./dist/main.js
+          body: |
+            Release ${{ steps.tag.outputs.tag }} is available now
+            
+            ## Release Assets
+            - `main.js` - The compiled action
+            - `sbom.spdx.json` - Software Bill of Materials (SBOM) in SPDX format
+          files: |
+            ./dist/main.js
+            ./sbom.spdx.json
           token: ${{ steps.get_workflow_token.outputs.token }}
 
       - run: |
