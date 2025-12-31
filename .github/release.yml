@@ -4,7 +4,10 @@ changelog:
       labels:
         - Semver-Minor
         - enhancement
-    - title: Dependency updates
+    - title: Dependency updates (GitHub Actions)
+      labels:
+        - github_actions
+    - title: Dependency updates (Other)
       labels:
         - dependencies
     - title: Other Changes
