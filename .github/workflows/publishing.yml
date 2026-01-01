@@ -24,7 +24,7 @@ jobs:
           application_id: ${{ vars.DEVOPS_ACTIONS_APPLICATION_ID }}
           application_private_key: ${{ secrets.DEVOPS_ACTIONS_APPLICATION_KEY }}
 
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       
       - uses: ./
         id: load-runner-info-org
@@ -38,7 +38,7 @@ jobs:
           echo '${{ steps.load-runner-info-org.outputs.grouped }}' > 'runners-grouped-organization.json'
             
       - name: Upload result file as artefact for inspection
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with: 
           name: runners-organization-${{ env.organization }}
           path: 'runners-**.json'
@@ -88,7 +88,7 @@ jobs:
       contents: write
     steps:
       # get code
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       # build it
       - run: |
