@@ -8,14 +8,390 @@ on:
   # Allow manual triggering
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: pwsh
+
 permissions:
   contents: read
   issues: write
 
 jobs:
-  check-release:
-    name: Check if release is needed
-    uses: devops-actions/.github/.github/workflows/time-for-new-release.yml@main
-    # Workflow automatically detects:
-    #   1. Code changes to the action (not just docs/tests)
-    #   2. Security-related dependency updates
+  check-time-for-new-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0 # we need all tags
+          ref: main # we only publish from the main branch
+      
+      - id: needs-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get latest release/tag
+          try {
+            $release = gh api 'repos/{owner}/{repo}/releases/latest' | ConvertFrom-Json
+            $tag = $release.tag_name
+          } catch {
+            Write-Host "No releases found. Checking for tags..."
+            $tags = git tag --sort=-creatordate
+            if ($tags) {
+              $tag = $tags[0]
+              Write-Host "Found tag: $tag"
+            } else {
+              Write-Host "No tags or releases found. This might be the first release."
+              echo "newrelease=false" >> $env:GITHUB_OUTPUT
+              return
+            }
+          }
+          
+          # Get git describe info
+          $info = git describe --tags
+          
+          if ($null -eq $info) {
+            Write-Error "Error loading information from tags!"
+            return 1
+          }
+          
+          echo "Git describe info: [$info]"
+          
+          # Handle case where we're exactly on a tag
+          if ($info -notmatch '-') {
+            echo "Currently on a tag, no commits since last release"
+            echo "newrelease=false" >> $env:GITHUB_OUTPUT
+            return
+          }
+          
+          $commitsSinceLastTag = $info.Split("-")[1]
+          echo "Found [$commitsSinceLastTag] commits since last tag"
+          
+          # Check for code changes to the action itself
+          # Exclude: docs, README, .github/workflows, test files
+          $codeChanges = git diff --name-only "$tag..HEAD" | Where-Object {
+            $_ -notmatch '^(README|LICENSE|CHANGELOG|\.github/workflows|docs/|__tests__/|tests/|Tests/|\.md$|\.txt$)'
+          }
+          
+          $hasCodeChanges = $codeChanges.Count -gt 0
+          echo "Code changes found: $hasCodeChanges"
+          if ($hasCodeChanges) {
+            echo "Changed files:"
+            $codeChanges | ForEach-Object { echo "  - $_" }
+          }
+          
+          # Check for security-related dependency updates
+          $commits = git log "$tag..HEAD" --pretty=format:"%s"
+          $securityUpdates = $commits | Where-Object {
+            $_ -match '(security|vulnerability|CVE-|GHSA-|dependabot.*security)' -or
+            $_ -match 'Bump.*from.*\(security\)' -or
+            $_ -match '\[security\]'
+          }
+          
+          $hasSecurityUpdates = $securityUpdates.Count -gt 0
+          echo "Security updates found: $hasSecurityUpdates"
+          if ($hasSecurityUpdates) {
+            echo "Security-related commits:"
+            $securityUpdates | ForEach-Object { echo "  - $_" }
+          }
+          
+          # Determine if release is needed
+          if ($hasCodeChanges -or $hasSecurityUpdates) {
+            $reasons = @()
+            if ($hasCodeChanges) { $reasons += "code changes to the action" }
+            if ($hasSecurityUpdates) { $reasons += "security-related dependency updates" }
+            
+            $reasonText = $reasons -join " and "
+            echo "✅ Release needed due to: $reasonText"
+            echo "newrelease=true" >> $env:GITHUB_OUTPUT
+            echo "has_code_changes=$hasCodeChanges" >> $env:GITHUB_OUTPUT
+            echo "has_security_updates=$hasSecurityUpdates" >> $env:GITHUB_OUTPUT
+            
+            $tag = $($info.Split("-"))[0]
+            echo "tag=$tag" >> $env:GITHUB_OUTPUT
+            $version = $tag.Substring(1)
+            echo "version=$version" >> $env:GITHUB_OUTPUT
+          }
+          else {
+            echo "❌ No release needed - no code changes or security updates found"
+            echo "   (Only found non-code changes like docs, workflows, or tests)"
+            echo "newrelease=false" >> $env:GITHUB_OUTPUT
+          }
+      
+      - name: Show output
+        if: steps.needs-release.outputs.newrelease == 'true'
+        run: |
+          echo "## ✅ Release Recommended" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Current tag**: ${{ steps.needs-release.outputs.tag }}" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Current version**: ${{ steps.needs-release.outputs.version }}" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Reasons for release**:" >> $env:GITHUB_STEP_SUMMARY
+          if ("${{ steps.needs-release.outputs.has_code_changes }}" -eq "true") {
+            echo "- ✅ Code changes to the action detected" >> $env:GITHUB_STEP_SUMMARY
+          }
+          if ("${{ steps.needs-release.outputs.has_security_updates }}" -eq "true") {
+            echo "- ✅ Security-related dependency updates detected" >> $env:GITHUB_STEP_SUMMARY
+          }
+          
+      - name: Show output when false
+        if: steps.needs-release.outputs.newrelease == 'false'
+        run: |
+          echo "## ℹ️ No Release Needed" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "No code changes or security updates detected since last release." >> $env:GITHUB_STEP_SUMMARY
+          echo "Only documentation, workflow, or test changes found." >> $env:GITHUB_STEP_SUMMARY
+          
+      # if yes, call the api to create a new release
+      # fetch new release tag first (sem ver? or do we need to check if we made breaking changes? Should not be breaking if all it is, are dependency updates?
+      - name: Simple Semver
+        id: semver
+        if: steps.needs-release.outputs.newrelease == 'true'
+        uses: rajbos-actions/simple-semver@967d66a65b0c5afae2a815ab2d311f66a32293ab # v0.1.1
+        with:
+          semver-input: "${{ steps.needs-release.outputs.version }}"
+          increment: p
+
+      - name: Use new semver
+        if: steps.needs-release.outputs.newrelease == 'true'
+        run: |
+          echo "New tag:[${{ steps.semver.outputs.semver }}]" >> $env:GITHUB_STEP_SUMMARY
+          echo "newtag=${{ steps.semver.outputs.semver }}" >> $env:GITHUB_OUTPUT
+        id: new-version
+
+      - name: Gather commit information
+        id: commits
+        if: steps.needs-release.outputs.newrelease == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ steps.needs-release.outputs.tag }}"
+          
+          # Get commits since last tag
+          $commits = git log "$tag..HEAD" --pretty=format:"%h|%s|%an|%ad" --date=short
+          
+          # Parse commits for categories
+          $dependencies = @()
+          $securityUpdates = @()
+          $securityDependencies = @()
+          $features = @()
+          $fixes = @()
+          $other = @()
+          
+          foreach ($commit in $commits) {
+            $parts = $commit -split '\|'
+            $hash = $parts[0]
+            $message = $parts[1]
+            $author = $parts[2]
+            $date = $parts[3]
+            
+            $commitLine = "- $message ([$hash](https://github.com/${{ github.repository }}/commit/$hash)) by @$author on $date"
+            
+            # Check if it's a security-related update
+            $isSecurity = $message -match '(security|vulnerability|CVE-|GHSA-|dependabot.*security|\[security\])'
+            
+            # Check if it's a dependency update
+            $isDependency = $message -match '^(build|chore|ci)\(deps'
+            
+            if ($isSecurity) {
+              $securityLine = "- ⚠️ $message ([$hash](https://github.com/${{ github.repository }}/commit/$hash)) by @$author on $date"
+              $securityUpdates += $securityLine
+              
+              # Track if this security update is also a dependency update
+              if ($isDependency) {
+                $securityDependencies += $commitLine
+              }
+            }
+            
+            # Categorize by conventional commit type
+            if ($isDependency) {
+              if (-not $isSecurity) {
+                $dependencies += $commitLine
+              }
+            }
+            elseif ($message -match '^feat') {
+              $features += $commitLine
+            }
+            elseif ($message -match '^fix') {
+              $fixes += $commitLine
+            }
+            else {
+              if (-not $isSecurity) {
+                $other += $commitLine
+              }
+            }
+          }
+          
+          # Build changelog
+          $changelog = "## Changes since $tag`n`n"
+          
+          if ($securityUpdates.Count -gt 0) {
+            $changelog += "### 🔐 Security Updates`n"
+            $changelog += "**These security updates are a primary reason for this release.**`n`n"
+            $changelog += ($securityUpdates -join "`n") + "`n`n"
+          }
+          
+          if ($features.Count -gt 0) {
+            $changelog += "### 🚀 Features`n"
+            $changelog += ($features -join "`n") + "`n`n"
+          }
+          
+          if ($fixes.Count -gt 0) {
+            $changelog += "### 🐛 Bug Fixes`n"
+            $changelog += ($fixes -join "`n") + "`n`n"
+          }
+          
+          if ($dependencies.Count -gt 0) {
+            $changelog += "### 📦 Dependencies`n"
+            $changelog += ($dependencies -join "`n") + "`n`n"
+          }
+          
+          if ($other.Count -gt 0) {
+            $changelog += "### 🔧 Other Changes`n"
+            $changelog += ($other -join "`n") + "`n`n"
+          }
+          
+          # Save changelog to file
+          $changelog | Out-File -FilePath changelog.md -Encoding utf8
+          
+          # Calculate total dependency count (security + non-security)
+          $totalDependencies = $dependencies.Count + $securityDependencies.Count
+          
+          # Save counts
+          echo "commit_count=$($commits.Count)" >> $env:GITHUB_OUTPUT
+          echo "dependency_count=$($dependencies.Count)" >> $env:GITHUB_OUTPUT
+          echo "security_dependency_count=$($securityDependencies.Count)" >> $env:GITHUB_OUTPUT
+          echo "total_dependency_count=$totalDependencies" >> $env:GITHUB_OUTPUT
+          echo "security_count=$($securityUpdates.Count)" >> $env:GITHUB_OUTPUT
+          echo "feature_count=$($features.Count)" >> $env:GITHUB_OUTPUT
+          echo "fix_count=$($fixes.Count)" >> $env:GITHUB_OUTPUT
+
+      - name: Generate an SBOM for the repo
+        if: steps.needs-release.outputs.newrelease == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # install the extension
+          gh ext install advanced-security/gh-sbom
+          
+          # run it for an SPDX SBOM
+          $sbom = gh sbom -l | ConvertFrom-Json
+          $sbom | ConvertTo-Json -Depth 100 | Out-File -FilePath sbom-spdx.json -Encoding utf8
+          
+          # run it for a CycloneDX SBOM
+          $sbom = gh sbom -c -l | ConvertFrom-Json
+          $sbom | ConvertTo-Json -Depth 100 | Out-File -FilePath sbom-cyclonedx.json -Encoding utf8
+          
+          echo "✅ SBOM files generated" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Create release issue
+        if: steps.needs-release.outputs.newrelease == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Read changelog
+          $changelog = Get-Content -Path changelog.md -Raw
+          
+          # Build reason badges
+          $reasonBadges = ""
+          if ("${{ steps.needs-release.outputs.has_code_changes }}" -eq "true") {
+            $reasonBadges += "![Code Changes](https://img.shields.io/badge/Code%20Changes-Yes-green) "
+          }
+          if ("${{ steps.needs-release.outputs.has_security_updates }}" -eq "true") {
+            $reasonBadges += "![Security Updates](https://img.shields.io/badge/Security%20Updates-Yes-red) "
+          }
+          
+          # Create issue body
+          $body = @"
+          ## 🎉 Time to Release ${{ steps.new-version.outputs.newtag }}!
+          
+          $reasonBadges
+          
+          This repository is ready for a new release based on **meaningful changes** since the last release.
+          
+          ### 🎯 Release Triggers Detected
+          
+          $(if ("${{ steps.needs-release.outputs.has_code_changes }}" -eq "true") {
+            "- ✅ **Code changes to the action**: Changes detected in action source files (excluding docs, workflows, tests)"
+          } else { "" })
+          $(if ("${{ steps.needs-release.outputs.has_security_updates }}" -eq "true") {
+            "- ✅ **Security-related dependency updates**: Security fixes or vulnerability patches detected"
+          } else { "" })
+          
+          ### 📊 Summary
+          - **Current version**: ${{ steps.needs-release.outputs.tag }}
+          - **Next version**: ${{ steps.new-version.outputs.newtag }}
+          - **Total commits**: ${{ steps.commits.outputs.commit_count }}
+          - **Features**: ${{ steps.commits.outputs.feature_count }}
+          - **Bug fixes**: ${{ steps.commits.outputs.fix_count }}
+          $(if ("${{ steps.commits.outputs.total_dependency_count }}" -gt 0) {
+            if ("${{ steps.commits.outputs.security_dependency_count }}" -gt 0 -and "${{ steps.commits.outputs.dependency_count }}" -gt 0) {
+              "- **Dependency updates**: ${{ steps.commits.outputs.total_dependency_count }} total (${{ steps.commits.outputs.security_dependency_count }} security-related, ${{ steps.commits.outputs.dependency_count }} other)"
+            }
+            elseif ("${{ steps.commits.outputs.security_dependency_count }}" -gt 0) {
+              "- **Dependency updates**: ${{ steps.commits.outputs.security_dependency_count }} (all security-related)"
+            }
+            else {
+              "- **Dependency updates**: ${{ steps.commits.outputs.dependency_count }}"
+            }
+          } else { "" })
+          $(if ("${{ steps.commits.outputs.security_count }}" -gt 0) {
+            "- **Security updates**: ${{ steps.commits.outputs.security_count }} ⚠️"
+          } else { "" })
+          
+          $changelog
+          
+          ### 📋 Release Checklist
+          - [ ] Review the changelog above
+          - [ ] Verify security updates are critical enough to warrant immediate release
+          - [ ] Update version numbers if needed (consider major/minor for breaking changes)
+          - [ ] Review and merge any pending PRs
+          - [ ] Create and push the tag: ``git tag -a ${{ steps.new-version.outputs.newtag }} -m "Release ${{ steps.new-version.outputs.newtag }}"``
+          - [ ] Push tags: ``git push --tags``
+          - [ ] Verify the release workflow completes successfully
+          - [ ] Close this issue after release is published
+          
+          ### 📦 SBOM Information
+          SBOM files have been generated and are available in the workflow artifacts:
+          - SPDX format: ``sbom-spdx.json``
+          - CycloneDX format: ``sbom-cyclonedx.json``
+          
+          ### 🤖 Automation Note
+          This issue was automatically created by the [time-for-new-release workflow](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+          
+          **Release criteria**: This workflow only creates release issues when there are:
+          1. Code changes to the action itself (not just docs or tests), OR
+          2. Security-related dependency updates
+          
+          Once the release is published, this issue can be closed.
+          "@
+          
+          # Determine labels
+          $labels = @("release", "automated")
+          if ("${{ steps.needs-release.outputs.has_security_updates }}" -eq "true") {
+            $labels += "security"
+          }
+          
+          # Create the issue
+          $labelsArg = ($labels | ForEach-Object { "--label `"$_`"" }) -join " "
+          
+          Invoke-Expression "gh issue create --title `"🚀 Release ${{ steps.new-version.outputs.newtag }}`" --body `$body $labelsArg"
+          
+          echo "✅ Release issue created" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload SBOM artifacts
+        if: steps.needs-release.outputs.newrelease == 'true'
+        continue-on-error: true
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: sbom-files
+          path: |
+            sbom-spdx.json
+            sbom-cyclonedx.json
+            changelog.md
+          retention-days: 30
