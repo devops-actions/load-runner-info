@@ -38,7 +38,7 @@ jobs:
           echo '${{ steps.load-runner-info-org.outputs.grouped }}' > 'runners-grouped-organization.json'
             
       - name: Upload result file as artefact for inspection
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with: 
           name: runners-organization-${{ env.organization }}
           path: 'runners-**.json'
@@ -98,7 +98,7 @@ jobs:
       # get tag for this release
       - name: Get tag value
         id: tag
-        uses: devops-actions/action-get-tag@19f393df16cb09284484fb49bf678004bf50896a # v1.0.1
+        uses: devops-actions/action-get-tag@7121a0d02be4cc926d0866b83de2a62688199687 # v1.0.1
 
       - name: Get GitHub Application Token
         id: get_workflow_token
