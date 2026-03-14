@@ -5,6 +5,7 @@
     "description": "GitHub Action to load all available runner information for an organization",
     "main": "lib/main.js",
     "scripts": {
+        "compile": "tsc",
         "esbuild": "esbuild src/main.ts --bundle --outdir=dist --platform=node --external:vscode --external:@vscode/test-electron --external:jest",
         "format": "prettier --write **/*.ts",
         "format-check": "prettier --check **/*.ts",
@@ -12,6 +13,9 @@
         "package": "npm run esbuild",
         "test": "jest --passWithNoTests",
         "all": "npm run esbuild && npm run test # && npm run lint"
+    },
+    "engines": {
+        "node": ">=20"
     },
     "repository": {
         "type": "git",
