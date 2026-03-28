@@ -15,7 +15,7 @@
         "all": "npm run esbuild && npm run test # && npm run lint"
     },
     "engines": {
-        "node": ">=20"
+        "node": ">=24"
     },
     "repository": {
         "type": "git",
