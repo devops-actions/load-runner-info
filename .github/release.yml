@@ -4,6 +4,9 @@ changelog:
       labels:
         - Semver-Minor
         - enhancement
+    - title: Dependency updates (NPM)
+      labels:
+        - javascript
     - title: Dependency updates (GitHub Actions)
       labels:
         - github_actions
