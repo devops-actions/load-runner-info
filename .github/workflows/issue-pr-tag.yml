@@ -16,6 +16,8 @@ jobs:
     uses: devops-actions/.github/.github/workflows/issue-pr-tag.yml@main
     permissions:
       contents: read
+      issues: write
+      pull-requests: write
     with:
       org_name: ${{ vars.FIXED_ORG_NAME }}
       tag_team: ${{ vars.TAG_TEAM }}
