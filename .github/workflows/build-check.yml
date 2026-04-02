@@ -62,7 +62,7 @@ jobs:
 
       - name: Commit changes if any
         run: |
-          if [ -z "$(git status --porcelain)" ]; then 
+          if [ -n "$(git status --porcelain)" ]; then 
             echo "Found changes to commit"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git config --global user.name "github-actions[bot]"
