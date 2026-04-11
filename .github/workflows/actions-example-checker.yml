@@ -1,0 +1,12 @@
+name: Validate Action Examples
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-examples:
+    uses: devops-actions/.github/.github/workflows/actions-example-checker.yml@main
+    permissions:
+      contents: read
