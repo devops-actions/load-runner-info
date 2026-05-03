@@ -33,3 +33,31 @@ test('publishing workflow includes SBOM generation', () => {
   expect(releaseStep.with.files).toContain('sbom.spdx.json')
   expect(releaseStep.with.body).toContain('SBOM')
 })
+
+test('check-for-release workflow provisions labels before creating a release issue', () => {
+  const workflowPath = path.resolve('.github/workflows/check-for-release.yml')
+  expect(fs.existsSync(workflowPath)).toBe(true)
+
+  const workflowContent = fs.readFileSync(workflowPath, 'utf8')
+  const workflow = yaml.load(workflowContent) as any
+
+  expect(workflow).toBeDefined()
+  expect(workflow.jobs).toBeDefined()
+  expect(workflow.jobs['check-time-for-new-release']).toBeDefined()
+
+  const checkJob = workflow.jobs['check-time-for-new-release']
+  expect(checkJob.steps).toBeDefined()
+
+  const releaseIssueStep = checkJob.steps.find(
+    (step: any) => step.name === 'Create release issue'
+  )
+
+  expect(releaseIssueStep).toBeDefined()
+  expect(releaseIssueStep.run).toContain('gh label list --limit 200 --json name')
+  expect(releaseIssueStep.run).toContain('Name = "release"')
+  expect(releaseIssueStep.run).toContain('Name = "automated"')
+  expect(releaseIssueStep.run).toContain('Name = "security"')
+  expect(releaseIssueStep.run).toContain('& gh label create')
+  expect(releaseIssueStep.run).toContain('--body-file')
+  expect(releaseIssueStep.run).not.toContain('Invoke-Expression')
+})
