@@ -371,16 +371,56 @@ jobs:
           Once the release is published, this issue can be closed.
           "@
           
-          # Determine labels
-          $labels = @("release", "automated")
+          # Ensure the workflow labels exist before creating the issue
+          $labelDefinitions = @(
+            @{
+              Name = "release"
+              Color = "5319e7"
+              Description = "Issues and pull requests related to releasing"
+            },
+            @{
+              Name = "automated"
+              Color = "1d76db"
+              Description = "Created or updated by automation"
+            }
+          )
           if ("${{ steps.needs-release.outputs.has_security_updates }}" -eq "true") {
-            $labels += "security"
+            $labelDefinitions += @{
+              Name = "security"
+              Color = "d93f0b"
+              Description = "Security-related work"
+            }
           }
-          
-          # Create the issue
-          $labelsArg = ($labels | ForEach-Object { "--label `"$_`"" }) -join " "
-          
-          Invoke-Expression "gh issue create --title `"🚀 Release ${{ steps.new-version.outputs.newtag }}`" --body `$body $labelsArg"
+
+          $existingLabels = @(
+            gh label list --limit 200 --json name |
+              ConvertFrom-Json |
+              Select-Object -ExpandProperty name
+          )
+
+          foreach ($labelDefinition in $labelDefinitions) {
+            if ($labelDefinition.Name -notin $existingLabels) {
+              & gh label create $labelDefinition.Name --color $labelDefinition.Color --description $labelDefinition.Description
+            }
+          }
+
+          $bodyPath = Join-Path $PWD "release-issue-body.md"
+          $body | Out-File -FilePath $bodyPath -Encoding utf8
+
+          $issueArgs = @(
+            "issue",
+            "create",
+            "--title",
+            "🚀 Release ${{ steps.new-version.outputs.newtag }}",
+            "--body-file",
+            $bodyPath
+          )
+
+          foreach ($labelDefinition in $labelDefinitions) {
+            $issueArgs += @("--label", $labelDefinition.Name)
+          }
+
+          & gh @issueArgs
           
           echo "✅ Release issue created" >> $env:GITHUB_STEP_SUMMARY
 
