@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   actionlint:
-    uses: devops-actions/.github/.github/workflows/actionlint.yml@main
+    uses: devops-actions/.github/.github/workflows/actionlint.yml@b77cea6d7ba1cd4e001581783cc592bbb63ce46d # main
     permissions:
       contents: read
       pull-requests: write

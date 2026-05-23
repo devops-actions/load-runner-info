@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   notify:
-    uses: devops-actions/.github/.github/workflows/issue-pr-tag.yml@main
+    uses: devops-actions/.github/.github/workflows/issue-pr-tag.yml@b77cea6d7ba1cd4e001581783cc592bbb63ce46d # main
     permissions:
       contents: read
       issues: write

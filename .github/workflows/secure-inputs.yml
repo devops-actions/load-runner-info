@@ -21,6 +21,6 @@ permissions:
 
 jobs:
   scan-inputs:
-    uses: devops-actions/.github/.github/workflows/secure-inputs.yml@b77cea6
+    uses: devops-actions/.github/.github/workflows/secure-inputs.yml@b77cea6d7ba1cd4e001581783cc592bbb63ce46d # main
     permissions:
       contents: read

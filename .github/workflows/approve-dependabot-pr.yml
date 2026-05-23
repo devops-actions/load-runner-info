@@ -11,6 +11,6 @@ jobs:
       contents: write
       pull-requests: write
       actions: write
-    uses: devops-actions/.github/.github/workflows/approve-dependabot-pr.yml@main
+    uses: devops-actions/.github/.github/workflows/approve-dependabot-pr.yml@b77cea6d7ba1cd4e001581783cc592bbb63ce46d # main
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
