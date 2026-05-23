@@ -1,0 +1,26 @@
+name: Secure Input Scan
+
+# Scans pull requests, issues, and comments for known attack vectors:
+# - Hidden Unicode characters incl. Unicode Tag Characters (AI instruction embedding)
+# - Bidirectional text overrides (Trojan Source)
+# - Shell / template / script injection
+# - Prompt injection targeting AI agents in CI/CD pipelines
+# See: devops-actions/.github/.github/workflows/secure-inputs.yml
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+  issues:
+    types: [opened, edited]
+
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  scan-inputs:
+    uses: devops-actions/.github/.github/workflows/secure-inputs.yml@main
+    permissions:
+      contents: read
