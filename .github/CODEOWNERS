@@ -1,0 +1,20 @@
+# Protect sensitive files from unauthorized modification.
+# Any PR touching these files requires explicit review from @rajbos.
+# Reference: GitHub Actions supply chain attack research (2025)
+
+# Workflow files — any change here requires review (supply chain attack prevention)
+.github/workflows/               @rajbos
+
+# AI coding instruction files — protect against "Rules File Backdoor" attacks
+# Reference: Pillar Security (March 2025), CVE-2025-59536
+.github/copilot-instructions.md  @rajbos
+.github/prompts/                 @rajbos
+AGENTS.md                        @rajbos
+CLAUDE.md                        @rajbos
+.cursor/                         @rajbos
+.cursorrules                     @rajbos
+.windsurfrules                   @rajbos
+.claude/                         @rajbos
+.gemini/                         @rajbos
+.codex/                          @rajbos
+copilot-instructions.md          @rajbos
