@@ -42,7 +42,7 @@
         "ansi-regex": ">=6.2.2",
         "dotenv": "^17.4.2",
         "esbuild": "^0.28.1",
-        "eslint": "^10.6.0",
+        "eslint": "^9.0.0",
         "eslint-plugin-github": "^6.0.0",
         "eslint-plugin-jest": "^29.15.4",
         "jest": "^30.4.2",
