@@ -112,7 +112,7 @@ jobs:
       # get tag for this release
       - name: Get tag value
         id: tag
-        uses: devops-actions/action-get-tag@7121a0d02be4cc926d0866b83de2a62688199687 # v1.0.1
+        uses: devops-actions/action-get-tag@72a6a37ed663481e5b8f89c6ad4820cd572def8e # v1.0.1
 
       - name: Get GitHub Application Token
         id: get_workflow_token
