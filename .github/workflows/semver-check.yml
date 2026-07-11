@@ -5,6 +5,10 @@ on:
       - '*'
   workflow_dispatch:
 
+# Declare default GITHUB_TOKEN permissions as read only.
+permissions:
+  contents: read
+
 jobs:
   semver:
     runs-on: ubuntu-latest
