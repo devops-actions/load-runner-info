@@ -7,7 +7,7 @@ on:
     - cron: '0 0 * * 1' # Weekly
 jobs:
   submit-dependencies:
-    uses: devops-actions/.github/.github/workflows/actions-dependencies.yml@1025096c3a41498850f3457dfec7bd1a643424ef # main
+    uses: devops-actions/.github/.github/workflows/actions-dependencies.yml@72f72c4ce25d0ab32530f581be0de7e914365c29 # main
     permissions:
       contents: write # Required to read workflow files
       id-token: write # Required for dependency submission
