@@ -407,22 +407,45 @@ jobs:
           $bodyPath = Join-Path $PWD "release-issue-body.md"
           $body | Out-File -FilePath $bodyPath -Encoding utf8
 
-          $issueArgs = @(
-            "issue",
-            "create",
-            "--title",
-            "🚀 Release ${{ steps.new-version.outputs.newtag }}",
-            "--body-file",
-            $bodyPath
+          $title = "🚀 Release ${{ steps.new-version.outputs.newtag }}"
+
+          # Find open release issues created by this workflow, so we update instead of creating duplicates
+          $openReleaseIssues = @(
+            gh issue list --state open --label release --label automated --limit 100 --json number,title,createdAt |
+              ConvertFrom-Json |
+              Sort-Object -Property createdAt -Descending
           )
 
-          foreach ($labelDefinition in $labelDefinitions) {
-            $issueArgs += @("--label", $labelDefinition.Name)
+          $existing = $openReleaseIssues | Where-Object { $_.title -eq $title } | Select-Object -First 1
+
+          if ($existing) {
+            # Refresh the newest matching issue with the latest changelog
+            $editArgs = @("issue", "edit", "$($existing.number)", "--body-file", $bodyPath)
+            foreach ($labelDefinition in $labelDefinitions) {
+              $editArgs += @("--add-label", $labelDefinition.Name)
+            }
+            & gh @editArgs
+            gh issue comment $existing.number --body "🔄 Release is still pending. Issue body refreshed with the latest changes by [this run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+            $issueNumber = $existing.number
+            echo "♻️ Updated existing release issue #$issueNumber" >> $env:GITHUB_STEP_SUMMARY
+          }
+          else {
+            $issueArgs = @("issue", "create", "--title", $title, "--body-file", $bodyPath)
+            foreach ($labelDefinition in $labelDefinitions) {
+              $issueArgs += @("--label", $labelDefinition.Name)
+            }
+            $issueUrl = & gh @issueArgs
+            $issueNumber = [int]($issueUrl.Trim().Split('/')[-1])
+            echo "✅ Release issue created: $issueUrl" >> $env:GITHUB_STEP_SUMMARY
           }
 
-          & gh @issueArgs
-          
-          echo "✅ Release issue created" >> $env:GITHUB_STEP_SUMMARY
+          # Close any other open release issues (older duplicates or superseded versions)
+          foreach ($issue in $openReleaseIssues) {
+            if ($issue.number -ne $issueNumber) {
+              gh issue close $issue.number --reason "not planned" --comment "Superseded by #$issueNumber."
+              echo "🧹 Closed superseded release issue #$($issue.number)" >> $env:GITHUB_STEP_SUMMARY
+            }
+          }
 
       - name: Upload SBOM artifacts
         if: steps.needs-release.outputs.newrelease == 'true'
