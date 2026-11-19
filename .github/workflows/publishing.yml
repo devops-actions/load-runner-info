@@ -116,7 +116,7 @@ jobs:
       contents: write       # create the release and upload its assets
       id-token: write       # Sigstore keyless signing for the attestations
       attestations: write   # store the attestations
-    uses: devops-actions/.github/.github/workflows/rw-release-attestation.yml@b88953c2b5ba6cfc3048a7fb6d32dc78e1588c58 # main
+    uses: devops-actions/.github/.github/workflows/rw-release-attestation.yml@df79d4ec70f2ad9cd6432a1087a9546dae7ced50 # main
 
   notify:
     needs: release
