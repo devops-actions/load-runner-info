@@ -3,35 +3,34 @@ import fs from 'fs'
 import yaml from 'js-yaml'
 import path from 'path'
 
-test('publishing workflow includes SBOM generation', () => {
+test('publishing workflow releases with SBOMs and attestations', () => {
   const workflowPath = path.resolve('.github/workflows/publishing.yml')
   expect(fs.existsSync(workflowPath)).toBe(true)
-  
+
   const workflowContent = fs.readFileSync(workflowPath, 'utf8')
   const workflow = yaml.load(workflowContent) as any
-  
+
   expect(workflow).toBeDefined()
   expect(workflow.jobs).toBeDefined()
-  expect(workflow.jobs.publish).toBeDefined()
-  
-  const publishJob = workflow.jobs.publish
-  expect(publishJob.steps).toBeDefined()
-  
-  // Check that SBOM generation step exists
-  const sbomStep = publishJob.steps.find((step: any) => 
-    step.name && step.name.includes('Generate SBOM')
+
+  // The release (with SBOMs and artifact attestations) is created by the shared
+  // reusable workflow in devops-actions/.github, pinned to a commit SHA
+  const releaseJob = workflow.jobs.release
+  expect(releaseJob).toBeDefined()
+  expect(releaseJob.uses).toMatch(
+    /^devops-actions\/\.github\/\.github\/workflows\/rw-release-attestation\.yml@[0-9a-f]{40}$/
   )
-  expect(sbomStep).toBeDefined()
-  expect(sbomStep.run).toContain('gh api')
-  expect(sbomStep.run).toContain('dependency-graph/sbom')
-  
-  // Check that release step includes SBOM file
-  const releaseStep = publishJob.steps.find((step: any) => 
-    step.uses && step.uses.includes('action-gh-release')
-  )
-  expect(releaseStep).toBeDefined()
-  expect(releaseStep.with.files).toContain('sbom.spdx.json')
-  expect(releaseStep.with.body).toContain('SBOM')
+
+  // The reusable workflow needs these permissions to create, sign and store the attestations
+  expect(releaseJob.permissions).toEqual({
+    contents: 'write',
+    'id-token': 'write',
+    attestations: 'write'
+  })
+
+  // Only release after the build and the action tests passed
+  expect(workflow.jobs.build).toBeDefined()
+  expect(releaseJob.needs).toBe('build')
 })
 
 test('check-for-release workflow provisions labels before creating a release issue', () => {
