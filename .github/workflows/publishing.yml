@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
         with:
           egress-policy: audit
 
@@ -92,7 +92,7 @@ jobs:
     steps:
       # get code
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
         with:
           egress-policy: audit
 
@@ -116,7 +116,7 @@ jobs:
       contents: write       # create the release and upload its assets
       id-token: write       # Sigstore keyless signing for the attestations
       attestations: write   # store the attestations
-    uses: devops-actions/.github/.github/workflows/rw-release-attestation.yml@df79d4ec70f2ad9cd6432a1087a9546dae7ced50 # main
+    uses: devops-actions/.github/.github/workflows/rw-release-attestation.yml@97cb794781522d095e049b3201323325c30d4fad # main
 
   notify:
     needs: release
