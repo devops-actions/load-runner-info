@@ -32,19 +32,6 @@ updates:
           - "prettier"
           - "esbuild"
     
-  # Enable version updates for actions with grouping
-  - package-ecosystem: 'github-actions'
-    directory: '.github/workflows/'
-    # Check for action updates every month
-    schedule:
-      interval: 'monthly'
-    open-pull-requests-limit: 3
-    groups:
-      # Group all GitHub Actions updates together
-      github-actions:
-        patterns:
-          - "*"
-
   - package-ecosystem: github-actions
     directory: /
     schedule:
